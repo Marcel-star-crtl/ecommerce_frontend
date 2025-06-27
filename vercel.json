@@ -27,7 +27,7 @@
   ],
   "env": {
     "REACT_APP_BASE_NAME": "/",
-    "PUBLIC_URL": "https://ecommerce-api-1-c0uz.onrender.com",
+    "PUBLIC_URL": "https://hoj-f2ue.vercel.app",
     "CI": "false"
   },
   "build": {
