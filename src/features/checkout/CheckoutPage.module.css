@@ -1,0 +1,177 @@
+.checkoutContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .checkoutTitle {
+    font-size: 2rem;
+    font-weight: 500;
+    margin-bottom: 2rem;
+    color: #333;
+  }
+  
+  .checkoutGrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+  }
+  
+  .checkoutForm {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  .formSection {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .formSection h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+  
+  .formGroup {
+    margin-bottom: 1rem;
+  }
+  
+  .formRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  .formGroup label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    color: #666;
+  }
+  
+  .formGroup input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .paymentMethods {
+    margin-top: 1rem;
+  }
+  
+  .paymentMethod {
+    display: block;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .paymentMethod input {
+    margin-right: 0.5rem;
+  }
+  
+  .cardDetails {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f9f9f9;
+    border-radius: 4px;
+  }
+  
+  .orderSummary {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 1rem;
+  }
+  
+  .orderSummary h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+  
+  .orderItems {
+    margin-bottom: 1.5rem;
+  }
+  
+  .orderItem {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .itemInfo h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  
+  .itemInfo p {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+  }
+  
+  .itemPrice {
+    text-align: right;
+  }
+  
+  .itemPrice span {
+    display: block;
+    font-weight: 500;
+  }
+  
+  .itemQuantity {
+    font-size: 0.875rem;
+    color: #666;
+  }
+  
+  .orderTotals {
+    margin-top: 2rem;
+  }
+  
+  .totalRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .grandTotal {
+    font-weight: 500;
+    font-size: 1.125rem;
+    color: #333;
+    border-bottom: none;
+  }
+  
+  .checkoutButton {
+    width: 100%;
+    padding: 1rem;
+    background-color: #E8A5C4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: background-color 0.2s;
+  }
+  
+  .checkoutButton:hover {
+    background-color: #E298BC;
+  }

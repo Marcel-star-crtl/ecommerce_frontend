@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "^/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "src": "^/favicon.ico",
+      "dest": "/favicon.ico"
+    },
+    {
+      "src": "^/manifest.json",
+      "dest": "/manifest.json"
+    },
+    {
+      "src": "^/asset-manifest.json",
+      "dest": "/asset-manifest.json"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "^/.*",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "REACT_APP_BASE_NAME": "/",
+    "PUBLIC_URL": "https://ecommerce-api-1-c0uz.onrender.com",
+    "CI": "false"
+  },
+  "build": {
+    "env": {
+      "CI": "false"
+    }
+  }
+}

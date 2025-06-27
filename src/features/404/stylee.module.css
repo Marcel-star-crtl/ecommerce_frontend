@@ -1,0 +1,291 @@
+/* @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap");
+
+.back {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.438rem;
+  font-weight: 500;
+  color: hsl(38, 8%, 8%);
+  background-color: hsl(38, 69%, 59%);
+  display: flex;
+  justify-content: center;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.containerr {
+  max-width: 1024px;
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+}
+
+.main {
+  overflow: hidden;
+}
+
+.home {
+  padding: 9rem 0 2rem;
+  height: 100vh;
+  display: grid;
+}
+
+.home__container {
+  display: grid;
+  align-content: center;
+  row-gap: 2.5rem;
+}
+
+.home__data {
+  text-align: center;
+}
+
+.home__title {
+  font-size: 2.375rem;
+  margin: 0.75rem 0;
+}
+
+.home__button {
+  margin-top: 2rem;
+  display: inline-block;
+  background-color: hsl(38, 8%, 8%);
+  color: tomato;
+  font-weight: 600;
+  padding: 0.8rem 1.5rem;
+  border-radius: 3rem;
+  transition: 0.4s;
+}
+
+.home__button:hover {
+  box-shadow: 0 4px 12px hsla(38, 69%, 8%, 0.2);
+}
+
+.home__img img {
+  width: 230px;
+  animation: floaty 1.8s infinite alternate;
+}
+
+.home__img {
+  justify-self: center;
+}
+
+.home__shadow {
+  width: 130px;
+  height: 24px;
+  background-color: hsla(38, 21%, 19%, 0.16);
+  margin: 0 auto;
+  border-radius: 50%;
+  filter: blur(7px);
+  animation: shadow 1.8s infinite alternate;
+}
+
+@keyframes floaty {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(15px);
+  }
+}
+
+@keyframes shadow {
+  0% {
+    transform: scale(1, 1);
+  }
+  100% {
+    transform: scale(0.85, 0.85);
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .home {
+    padding-top: 7rem;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .home__container {
+    grid-template-columns: repeat(2, 1fr);
+    align-items: center;
+    column-gap: 2rem;
+  }
+  .home__data {
+    text-align: initial;
+  }
+  .home__img img {
+    width: 400px;
+  }
+  .home__shadow {
+    width: 250px;
+    height: 40px;
+  }
+}
+
+@media screen and (min-width: 1048px) {
+  .containerr {
+    margin-left: auto;
+    margin-right: auto;
+  }
+} */
+
+
+
+
+
+
+
+
+
+
+/* @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap"); */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.back {
+  /* font-family: "Space Grotesk", sans-serif; */
+  font-family: "Roboto", sans-serif !important;
+  background-color: #f7f8fc;
+  color: #2b2b2b;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.containerr {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.home {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.home__container {
+  display: grid;
+  row-gap: 2rem;
+  max-width: 1100px;
+  margin: auto;
+}
+
+.home__data {
+  text-align: center;
+  padding: 0 1.5rem;
+}
+
+.home__title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2b2b2b;
+  margin: 1rem 0;
+}
+
+.home__subtitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffd333;
+}
+
+.home__description {
+  font-size: 1rem;
+  color: #666;
+  margin: 1.2rem 0;
+}
+
+.home__button {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  margin-top: 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #ffd333;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.home__button:hover {
+  background-color: #ff3b3b;
+}
+
+.home__img {
+  position: relative;
+  margin-top: 2rem;
+  animation: floaty 1.8s infinite alternate;
+}
+
+.home__img img {
+  width: 220px;
+}
+
+.home__shadow {
+  width: 150px;
+  height: 30px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translateX(-50%);
+  filter: blur(5px);
+  animation: shadow 1.8s infinite alternate;
+}
+
+/* Floating Animation */
+@keyframes floaty {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(12px);
+  }
+}
+
+@keyframes shadow {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0.85);
+  }
+}
+
+/* Media Queries for Responsive Design */
+@media screen and (max-width: 768px) {
+  .home__title {
+    font-size: 2rem;
+  }
+
+  .home__img img {
+    width: 180px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .home__title {
+    font-size: 1.8rem;
+  }
+
+  .home__button {
+    padding: 0.6rem 1.5rem;
+  }
+}
