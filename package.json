@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "main": "index.js",
-  "homepage": ".",
+  "homepage": "https://testshyneen.ulevus.com",
   "engines": {
     "node": "18.x"
   },
@@ -42,6 +42,7 @@
     "react-loading-skeleton": "^3.2.1",
     "react-owl-carousel": "^2.3.3",
     "react-redux": "^8.0.5",
+    "react-router-dom": "^6.11.0",
     "react-scripts": "5.0.1",
     "react-slick": "^0.29.0",
     "react-stickynode": "^4.1.0",
@@ -56,7 +57,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "set ESLINT_NO_DEV_ERRORS=true && set CI=false && react-scripts build",
+    "build": "cross-env ESLINT_NO_DEV_ERRORS=true CI=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -79,6 +80,6 @@
     ]
   },
   "devDependencies": {
-    "react-router-dom": "^6.11.0"
+    "cross-env": "^7.0.3"
   }
 }
