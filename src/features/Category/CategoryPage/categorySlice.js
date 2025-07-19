@@ -1,12 +1,29 @@
+// src/redux/slices/categorySlice.js (or wherever your categorySlice is)
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../../../api/api";
+import api from "../../../api/api"; // Adjust path if needed
 
-// Fetch all categories
-export const fetchCategories = createAsyncThunk(
-  "categories/fetchCategories",
+// New thunk to fetch products for a specific category with pagination
+export const fetchProductsByCategory = createAsyncThunk(
+  "category/fetchProductsByCategory",
+  async ({ categoryId, pageSize, page }, thunkAPI) => {
+    try {
+      // *** FIX: Ensure 'pageSize' is sent as the query parameter name ***
+      const response = await api.get(
+        `/category/${categoryId}/products?pageSize=${pageSize}&page=${page}`
+      );
+      return response.data; // This should now contain { products: [...], totalProductsCount: N, categoryName: "..." }
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+// Thunk to fetch all categories (used by DiscoverByCategory and HomePage)
+export const fetchAllCategories = createAsyncThunk(
+  "categories/fetchAllCategories",
   async (_, thunkAPI) => {
     try {
-      const response = await api.get("/category/");
+      const response = await api.get("/category/"); // Endpoint for all categories
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
@@ -14,75 +31,59 @@ export const fetchCategories = createAsyncThunk(
   }
 );
 
-// Fetch single category
-export const fetchCategory = createAsyncThunk(
-  "categories/fetchCategory",
-  async (categoryId, thunkAPI) => {
-    try {
-      const response = await api.get(`/category/${categoryId}`);
-      return response.data;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
-    }
-  }
-);
-
-const categoriesSlice = createSlice({
-  name: "categories",
+const categorySlice = createSlice({
+  name: "category",
   initialState: {
-    categories: [],
-    currentCategory: null,
-    status: "idle",
-    error: null,
+    // For CategoryPage (products by category)
+    products: [],
+    totalProductsCount: 0,
+    currentCategoryName: null,
+    status: "idle", // status for products of a specific category
+    error: null, // error for products of a specific category
+
+    // For DiscoverByCategory and HomePage (all categories)
+    allCategories: [],
+    allCategoriesStatus: "idle",
+    allCategoriesError: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch all categories
-      .addCase(fetchCategories.pending, (state) => {
+      // Reducers for fetchProductsByCategory
+      .addCase(fetchProductsByCategory.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })
-      .addCase(fetchCategories.fulfilled, (state, action) => {
+      .addCase(fetchProductsByCategory.fulfilled, (state, action) => {
         state.status = "succeeded";
-        // Map backend fields to frontend expectations
-        state.categories = action.payload.map(category => ({
-          id: category._id,
-          name: category.title,
-          // Handle different image formats from backend
-          image: category.image || null, // Keep the original image data structure
-          products: category.products || [],
+        // *** FIX: Map backend response keys to frontend state keys ***
+        state.products = action.payload.products || [];
+        state.totalProductsCount = action.payload.totalProductsCount || 0;
+        state.currentCategoryName = action.payload.categoryName || "Category";
+      })
+      .addCase(fetchProductsByCategory.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      // Reducers for fetchAllCategories (no changes needed here from previous corrections)
+      .addCase(fetchAllCategories.pending, (state) => {
+        state.allCategoriesStatus = "loading";
+        state.allCategoriesError = null;
+      })
+      .addCase(fetchAllCategories.fulfilled, (state, action) => {
+        state.allCategoriesStatus = "succeeded";
+        state.allCategories = action.payload.map((category) => ({
+          _id: category._id,
+          title: category.title,
+          image: category.image || null,
           productCount: category.productCount || 0,
-          createdAt: category.createdAt,
-          updatedAt: category.updatedAt
         }));
       })
-      .addCase(fetchCategories.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
-      })
-      // Fetch single category
-      .addCase(fetchCategory.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
-      .addCase(fetchCategory.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.currentCategory = {
-          id: action.payload._id,
-          name: action.payload.title,
-          image: action.payload.image || null,
-          products: action.payload.products || [],
-          productCount: action.payload.productCount || 0,
-          createdAt: action.payload.createdAt,
-          updatedAt: action.payload.updatedAt
-        };
-      })
-      .addCase(fetchCategory.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
+      .addCase(fetchAllCategories.rejected, (state, action) => {
+        state.allCategoriesStatus = "failed";
+        state.allCategoriesError = action.payload;
       });
   },
 });
 
-export default categoriesSlice.reducer;
+export default categorySlice.reducer;

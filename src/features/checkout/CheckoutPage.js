@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createOrder } from '../order/ordersSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import api from '../../api/api'; 
 
@@ -60,59 +61,8 @@ const CheckoutPage = () => {
     });
   };
 
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-    
-//     if (!formData.acceptTerms) {
-//       alert('Please accept the terms and conditions');
-//       return;
-//     }
-  
-//     try {
-//       const orderData = {
-//         cartId,
-//         products: cartProducts.map(item => ({
-//           productId: item.id || item._id,
-//           name: item.name || item.title,
-//           quantity: item.quantity || 1,
-//           price: item.price,
-//           image: item.images?.[0]?.url || item.image
-//         })),
-//         totalAmount: totalPay,
-//         currency: "USD",
-//         shippingAddress: {
-//           firstName: formData.firstName,
-//           lastName: formData.lastName,
-//           email: formData.email,
-//           phone: formData.phone,
-//           country: formData.country,
-//           city: formData.city,
-//           address: formData.address,
-//           postalCode: formData.postalCode
-//         },
-//         paymentMethod: 'card' 
-//       };
-  
-//       const response = await api.post('/orders/create-checkout-session', orderData);
-      
-//       if (response.data.url) {
-//         window.location.href = response.data.url;
-//       } else {
-//         navigate('/checkout/success', { 
-//           state: { 
-//             orderId: response.data.orderId,
-//             amount: totalPay
-//           } 
-//         });
-//       }
-//     } catch (error) {
-//       console.error('Payment error:', error);
-//       alert(error.response?.data?.message || 'Payment failed. Please try again.');
-//     }
-//   };
 
-
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!formData.acceptTerms) {
@@ -140,26 +90,28 @@ const handleSubmit = async (e) => {
           city: formData.city,
           address: formData.address,
           postalCode: formData.postalCode
-        }
+        },
+        paymentMethod: formData.paymentMethod
       };
   
-      const response = await api.post('/orders/create-order', orderData);
+      // Dispatch the createOrder action
+      const resultAction = await dispatch(createOrder(orderData));
       
-      if (response.data.success) {
-        // Redirect to success page for COD
+      if (createOrder.fulfilled.match(resultAction)) {
+        // Redirect to success page
         navigate('/checkout/success', { 
           state: { 
-            orderId: response.data.orderId,
+            orderId: resultAction.payload.orderId,
             amount: totalPay,
-            paymentMethod: 'Cash on Delivery'
+            paymentMethod: formData.paymentMethod
           } 
         });
       } else {
-        throw new Error(response.data.message || 'Order creation failed');
+        throw new Error(resultAction.payload || 'Order creation failed');
       }
     } catch (error) {
       console.error('Order error:', error);
-      alert(error.response?.data?.message || 'Order failed. Please try again.');
+      alert(error.message || 'Order failed. Please try again.');
     }
   };
 

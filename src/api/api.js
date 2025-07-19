@@ -84,8 +84,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  // baseURL: "http://localhost:5001/api",
-  baseURL: "https://ecommerce-api-1-c0uz.onrender.com/api",
+  baseURL: "http://localhost:5001/api",
+  // baseURL: "https://ecommerce-api-1-c0uz.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -121,7 +121,8 @@ api.interceptors.response.use(
         }
         
         const response = await axios.post(
-          "http://localhost:5000/api/user/refresh",
+          // "https://ecommerce-api-1-c0uz.onrender.com/user/refresh",
+          "http://localhost:5001/user/refresh",
           { refreshToken }
         );
         

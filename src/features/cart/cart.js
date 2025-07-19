@@ -199,25 +199,40 @@
 
 
 
+
+
+
+
+
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import CheckoutButton from "./CheckoutButton";
 
 // Assuming these actions exist in your cart slice
-import { deleteCartProduct, fetchCart, updateCartQuantity } from './cartSlice';
+import { deleteCartProduct, fetchCart, incrementCartProduct, decrementCartProduct } from './cartSlice';
 
 function Cart() {
   const dispatch = useDispatch();
-  
+
   // Redux state selectors
-  const { products, cartId, cartCount, totalPrice } = useSelector(
-    (state) => state.cart
-  );
+  const { 
+    products, 
+    cartId, 
+    cartCount, 
+    totalPrice,
+    fetchStatus,
+    incrementStatus,
+    decrementStatus,
+    deleteStatus,
+    error
+  } = useSelector((state) => state.cart);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  
+
   const componentRef = useRef(null);
   const [height, setHeight] = useState(0);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     if (componentRef.current) {
@@ -232,26 +247,130 @@ function Cart() {
     }
   }, [dispatch, isLoggedIn]);
 
-  const updateQuantity = (id, newQuantity) => {
+  // Track loading states for UI updates
+  useEffect(() => {
+    setIsUpdating(
+      incrementStatus === 'loading' || 
+      decrementStatus === 'loading' || 
+      deleteStatus === 'loading'
+    );
+  }, [incrementStatus, decrementStatus, deleteStatus]);
+
+  const updateQuantity = async (id, newQuantity) => {
+    if (isUpdating) return; // Prevent multiple simultaneous updates
+    
     if (newQuantity < 1) {
       handleDeleteItem(id);
       return;
     }
-    // dispatch(updateCartQuantity({ id, quantity: newQuantity }));
-    console.log('Updating quantity:', { id, quantity: newQuantity });
+
+    const currentItem = products.find(item => (item.id || item._id) === id);
+    if (!currentItem) {
+      console.error('Item not found in cart:', id);
+      return;
+    }
+
+    const currentQuantity = currentItem.quantity || currentItem.count || 1;
+    
+    try {
+      if (newQuantity > currentQuantity) {
+        // Increment quantity
+        console.log('Incrementing quantity for item:', id);
+        await dispatch(incrementCartProduct(id)).unwrap();
+      } else if (newQuantity < currentQuantity) {
+        // Decrement quantity
+        console.log('Decrementing quantity for item:', id);
+        await dispatch(decrementCartProduct(id)).unwrap();
+      }
+      
+      // Optionally refetch cart to ensure sync
+      // dispatch(fetchCart());
+      
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+      // You could show a toast notification here
+    }
   };
 
-  const handleDeleteItem = (id) => {
-    // dispatch(deleteCartProduct(id));
-    console.log('Deleting item:', id);
+  const handleDeleteItem = async (id) => {
+    if (isUpdating) return;
+    
+    try {
+      console.log('Deleting item:', id);
+      await dispatch(deleteCartProduct(id)).unwrap();
+      
+      // Optionally refetch cart to ensure sync
+      // dispatch(fetchCart());
+      
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      // You could show a toast notification here
+    }
   };
 
-  // Calculate derived values
-  const subtotal = totalPrice || (products?.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0) || 0);
-  const shipping = 0; 
-  const tax = subtotal * 0.08; 
+  // Calculate derived values with proper fallbacks
+  const subtotal = totalPrice || (products?.reduce((sum, item) => {
+    const quantity = item.quantity || item.count || 1;
+    const price = item.price || 0;
+    return sum + (price * quantity);
+  }, 0) || 0);
+  
+  const shipping = 0;
+  const tax = subtotal * 0.08;
   const total = subtotal + shipping + tax;
-  const itemCount = cartCount || products?.reduce((sum, item) => sum + (item.quantity || 1), 0) || 0;
+  
+  const itemCount = cartCount || products?.reduce((sum, item) => {
+    const quantity = item.quantity || item.count || 1;
+    return sum + quantity;
+  }, 0) || 0;
+
+  const navigate = useNavigate();
+
+  // Loading state
+  if (fetchStatus === 'loading') {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#f8f9fa',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div>Loading cart...</div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (fetchStatus === 'failed' && error) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#f8f9fa',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <h3>Error loading cart</h3>
+          <p>{error}</p>
+          <button 
+            onClick={() => dispatch(fetchCart())}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#E8A5C4',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Empty cart state
   if (!products?.length) {
@@ -302,7 +421,7 @@ function Cart() {
           }}>
             What are you waiting for?
           </p>
-          <Link 
+          <Link
             to="/home"
             style={{
               display: 'inline-block',
@@ -326,13 +445,15 @@ function Cart() {
   }
 
   return (
-    <div 
+    <div
       ref={componentRef}
       style={{
         minHeight: '100vh',
         backgroundColor: '#f8f9fa',
         padding: '20px',
-        fontFamily: 'Arial, sans-serif'
+        fontFamily: 'Arial, sans-serif',
+        opacity: isUpdating ? 0.8 : 1,
+        transition: 'opacity 0.2s'
       }}
     >
       <div style={{
@@ -400,187 +521,187 @@ function Cart() {
         }}>
           {/* Cart Items */}
           <div>
-            {products?.map((item, index) => (
-              <div key={item.id || item._id} style={{
-                display: 'flex',
-                gap: '20px',
-                paddingBottom: '25px',
-                marginBottom: '25px',
-                borderBottom: index < products.length - 1 ? '1px solid #f0f0f0' : 'none'
-              }}>
-                {/* Product Image */}
-                <div style={{
-                  width: '100px',
-                  height: '100px',
-                  backgroundColor: '#f8f9fa',
-                  borderRadius: '8px',
+            {products?.map((item, index) => {
+              const itemId = item.id || item._id;
+              const itemQuantity = item.quantity || item.count || 1;
+              const isItemUpdating = isUpdating; // You could track per-item if needed
+              
+              return (
+                <div key={itemId} style={{
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0
+                  gap: '20px',
+                  paddingBottom: '25px',
+                  marginBottom: '25px',
+                  borderBottom: index < products.length - 1 ? '1px solid #f0f0f0' : 'none',
+                  opacity: isItemUpdating ? 0.6 : 1,
+                  transition: 'opacity 0.2s'
                 }}>
-                  <Link to={`/product/${item.id || item._id}`}>
-                    <img 
-                      src={item.images?.[0]?.url || item.images?.[0] || item.image || 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=387&q=80'}
-                      alt={item.name || item.title}
-                      style={{
-                        width: '70px',
-                        height: '70px',
-                        objectFit: 'contain'
-                      }}
-                    />
-                  </Link>
-                </div>
-
-                {/* Product Details */}
-                <div style={{ flex: 1 }}>
-                  <Link 
-                    to={`/product/${item.id || item._id}`}
-                    style={{ textDecoration: 'none' }}
-                  >
-                    <h3 style={{
-                      fontSize: '16px',
-                      fontWeight: '500',
-                      color: '#333',
-                      margin: '0 0 8px 0'
-                    }}>
-                      {item.name || item.title}
-                    </h3>
-                  </Link>
-                  <p style={{
-                    fontSize: '13px',
-                    color: '#666',
-                    margin: '0 0 8px 0',
-                    lineHeight: '1.4'
+                  {/* Product Image */}
+                  <div style={{
+                    width: '100px',
+                    height: '100px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
                   }}>
-                    {item.description || 'Celestial Nightly Skin Repair Oil Serum for firming, Hydrating and Restoring + Soap'}
-                  </p>
-                  {item.itemNumber && (
+                    <Link to={`/product/${itemId}`}>
+                      <img
+                        src={item.images?.[0]?.url || item.images?.[0] || item.image || 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=387&q=80'}
+                        alt={item.name || item.title}
+                        style={{
+                          width: '70px',
+                          height: '70px',
+                          objectFit: 'contain'
+                        }}
+                      />
+                    </Link>
+                  </div>
+
+                  {/* Product Details */}
+                  <div style={{ flex: 1 }}>
+                    <Link
+                      to={`/product/${itemId}`}
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <h3 style={{
+                        fontSize: '16px',
+                        fontWeight: '500',
+                        color: '#333',
+                        margin: '0 0 8px 0'
+                      }}>
+                        {item.name || item.title}
+                      </h3>
+                    </Link>
                     <p style={{
-                      fontSize: '12px',
-                      color: '#999',
-                      margin: '0 0 4px 0'
+                      fontSize: '13px',
+                      color: '#666',
+                      margin: '0 0 8px 0',
+                      lineHeight: '1.4'
                     }}>
-                      ITEM {item.itemNumber}
+                      {item.description || 'Celestial Nightly Skin Repair Oil Serum for firming, Hydrating and Restoring + Soap'}
                     </p>
-                  )}
-                  {item.size && (
+                    {item.itemNumber && (
+                      <p style={{
+                        fontSize: '12px',
+                        color: '#999',
+                        margin: '0 0 4px 0'
+                      }}>
+                        ITEM {item.itemNumber}
+                      </p>
+                    )}
+                    {item.size && (
+                      <p style={{
+                        fontSize: '12px',
+                        color: '#666',
+                        margin: '0 0 8px 0'
+                      }}>
+                        Size: {item.size}
+                      </p>
+                    )}
                     <p style={{
                       fontSize: '12px',
                       color: '#666',
-                      margin: '0 0 8px 0'
+                      margin: '0 0 12px 0'
                     }}>
-                      Size: {item.size}
+                      Sold by Shyneen
                     </p>
-                  )}
-                  {/* <p style={{
-                    fontSize: '12px',
-                    color: '#666',
-                    margin: '0 0 8px 0'
-                  }}>
-                    Order Within 24 hr
-                  </p>
-                  <p style={{
-                    fontSize: '12px',
-                    color: '#666',
-                    margin: '0 0 8px 0'
-                  }}>
-                    Free delivery by Sat, May 6
-                  </p> */}
-                  <p style={{
-                    fontSize: '12px',
-                    color: '#666',
-                    margin: '0 0 12px 0'
-                  }}>
-                    Sold by Shyneen
-                  </p>
-                  <button 
-                    onClick={() => handleDeleteItem(item.id || item._id)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      fontSize: '12px',
-                      color: '#E8A5C4',
-                      cursor: 'pointer',
-                      textDecoration: 'underline',
-                      padding: '0',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '5px'
-                    }}
-                  >
-                    <i className="fa-solid fa-trash"></i>
-                    <span>Remove</span>
-                  </button>
-                </div>
-
-                {/* Price and Quantity */}
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-end',
-                  justifyContent: 'space-between',
-                  minWidth: '120px'
-                }}>
-                  <div style={{
-                    fontSize: '16px',
-                    fontWeight: '500',
-                    color: '#333',
-                    marginBottom: '10px'
-                  }}>
-                    ${item.price?.toFixed(2)}
+                    <button
+                      onClick={() => handleDeleteItem(itemId)}
+                      disabled={isItemUpdating}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        fontSize: '12px',
+                        color: isItemUpdating ? '#ccc' : '#E8A5C4',
+                        cursor: isItemUpdating ? 'not-allowed' : 'pointer',
+                        textDecoration: 'underline',
+                        padding: '0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px'
+                      }}
+                    >
+                      <i className="fa-solid fa-trash"></i>
+                      <span>Remove</span>
+                    </button>
                   </div>
-                  
-                  {/* Quantity Controls */}
+
+                  {/* Price and Quantity */}
                   <div style={{
                     display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    marginBottom: '10px'
+                    flexDirection: 'column',
+                    alignItems: 'flex-end',
+                    justifyContent: 'space-between',
+                    minWidth: '120px'
                   }}>
-                    <button
-                      onClick={() => updateQuantity(item.id || item._id, (item.quantity || 1) - 1)}
-                      style={{
-                        width: '24px',
-                        height: '24px',
-                        border: '1px solid #ddd',
-                        backgroundColor: 'white',
-                        fontSize: '14px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      −
-                    </button>
-                    <span style={{
-                      fontSize: '14px',
-                      minWidth: '20px',
-                      textAlign: 'center'
+                    <div style={{
+                      fontSize: '16px',
+                      fontWeight: '500',
+                      color: '#333',
+                      marginBottom: '10px'
                     }}>
-                      {item.quantity || 1}
-                    </span>
-                    <button
-                      onClick={() => updateQuantity(item.id || item._id, (item.quantity || 1) + 1)}
-                      style={{
-                        width: '24px',
-                        height: '24px',
-                        border: '1px solid #ddd',
-                        backgroundColor: 'white',
+                      ${item.price?.toFixed(2)}
+                    </div>
+
+                    {/* Quantity Controls */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      marginBottom: '10px'
+                    }}>
+                      <button
+                        onClick={() => updateQuantity(itemId, itemQuantity - 1)}
+                        disabled={isItemUpdating || itemQuantity <= 1}
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          border: '1px solid #ddd',
+                          backgroundColor: isItemUpdating || itemQuantity <= 1 ? '#f5f5f5' : 'white',
+                          fontSize: '14px',
+                          cursor: isItemUpdating || itemQuantity <= 1 ? 'not-allowed' : 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: isItemUpdating || itemQuantity <= 1 ? '#ccc' : '#333'
+                        }}
+                      >
+                        −
+                      </button>
+                      <span style={{
                         fontSize: '14px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      +
-                    </button>
+                        minWidth: '20px',
+                        textAlign: 'center',
+                        fontWeight: '500'
+                      }}>
+                        {itemQuantity}
+                      </span>
+                      <button
+                        onClick={() => updateQuantity(itemId, itemQuantity + 1)}
+                        disabled={isItemUpdating}
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          border: '1px solid #ddd',
+                          backgroundColor: isItemUpdating ? '#f5f5f5' : 'white',
+                          fontSize: '14px',
+                          cursor: isItemUpdating ? 'not-allowed' : 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: isItemUpdating ? '#ccc' : '#333'
+                        }}
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Order Summary - Sticky */}
@@ -681,31 +802,34 @@ function Cart() {
               </div>
 
               {/* Checkout Button */}
-              <CheckoutButton 
-                cartId={cartId}
-                products={products}
-                totalAmount={total}
-                disabled={!products?.length}
-              />
-              {/* <button
+              <button
+                disabled={!products?.length || isUpdating}
                 style={{
                   width: '100%',
                   padding: '15px',
-                  backgroundColor: '#E8A5C4',
+                  backgroundColor: (!products?.length || isUpdating) ? '#ccc' : '#E8A5C4',
                   color: 'white',
                   border: 'none',
                   fontSize: '14px',
                   fontWeight: '500',
-                  cursor: 'pointer',
+                  cursor: (!products?.length || isUpdating) ? 'not-allowed' : 'pointer',
                   transition: 'background-color 0.2s',
                   marginBottom: '15px'
                 }}
-                onMouseOver={(e) => e.target.style.backgroundColor = '#E298BC'}
-                onMouseOut={(e) => e.target.style.backgroundColor = '#E8A5C4'}
-                onClick={() => console.log('Proceeding to checkout with cartId:', cartId)}
+                onMouseOver={(e) => {
+                  if (!e.target.disabled) {
+                    e.target.style.backgroundColor = '#E298BC';
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (!e.target.disabled) {
+                    e.target.style.backgroundColor = '#E8A5C4';
+                  }
+                }}
+                onClick={() => navigate("/checkout")}
               >
-                Proceed to Checkout
-              </button> */}
+                {isUpdating ? 'Updating...' : 'Proceed to Checkout'}
+              </button>
 
               {/* Continue Shopping */}
               <Link
@@ -745,8 +869,6 @@ function Cart() {
 }
 
 export default Cart;
-
-
 
 
 

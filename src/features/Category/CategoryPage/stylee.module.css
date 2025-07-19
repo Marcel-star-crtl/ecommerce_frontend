@@ -28,6 +28,7 @@
   width: 100%;
   margin-bottom: 20px;
   position: relative;
+  color: "#E8A5C4";
 }
 
 .whichlistTitle::after {
@@ -54,7 +55,7 @@
   margin-top: 40px;
 }
 .pagination a {
-  color: #4f4f4f !important;
+  color: #E8A5C4 !important;
 }
 
 .pagination li {

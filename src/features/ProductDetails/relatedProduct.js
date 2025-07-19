@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { MDBRow } from "mdb-react-ui-kit";
 
 import ProductCard from "../layout/ProductCard/ProductCard";
-import { fetchCategories } from "../Category/CategoryPage/categorySlice";
+import { fetchAllCategories } from "../Category/CategoryPage/categorySlice";
 import ProductCardSkeleton from "../layout/ProductCard/ProductCardSkeleton";
 
 export default function RelatedProduct({ categoryId }) {
@@ -15,7 +15,7 @@ export default function RelatedProduct({ categoryId }) {
   const [pageSize, setPageSize] = useState(8);
   const [page, setPage] = useState(1);
   useEffect(() => {
-    dispatch(fetchCategories({ categoryId, pageSize, page }));
+    dispatch(fetchAllCategories({ categoryId, pageSize, page }));
   }, [categoryId, dispatch]);
 
   useEffect(() => {

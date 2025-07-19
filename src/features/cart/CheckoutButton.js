@@ -26,6 +26,7 @@ function CheckoutButton({ cartId, products, totalAmount, disabled }) {
     // Validate user is logged in
     if (!user) {
       setError("Please login to complete checkout");
+      console.log("user data", user)
       return;
     }
 

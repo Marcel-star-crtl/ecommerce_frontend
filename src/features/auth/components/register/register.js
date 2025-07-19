@@ -7,7 +7,7 @@ function Register() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [mobile, setMobile] = useState(''); // New mobile state
+  const [mobile, setMobile] = useState(''); 
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [subscribeToComms, setSubscribeToComms] = useState(false);
@@ -72,8 +72,7 @@ function Register() {
     <div
       style={{
         minHeight: "100vh",
-        backgroundImage:
-          'linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=2070&q=80")',
+        backgroundImage: 'linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url("/assets/slide1.png")',
         backgroundSize: "cover",
         backgroundPosition: "center",
         display: "flex",

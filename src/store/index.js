@@ -10,6 +10,7 @@ import ordersSlice from "../features/order/ordersSlice";
 import productHomePageSlice from "../features/home/productHomePageSlice";
 import shopsReducer from "../features/shops/shopsSlice";
 import bestSellersReducer from '../features/ProductDetails/bestSellersSlice';
+import videoReducer from '../slices/videoSlice'; 
 
 const store = configureStore({
   reducer: {
@@ -23,7 +24,8 @@ const store = configureStore({
     orders: ordersSlice,
     productHomePage: productHomePageSlice,
     shops: shopsReducer,
-    bestSellers: bestSellersReducer
+    bestSellers: bestSellersReducer,
+    video: videoReducer,
   },
 });
 

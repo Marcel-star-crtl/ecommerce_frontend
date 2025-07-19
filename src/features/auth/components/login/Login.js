@@ -187,7 +187,6 @@
 
 
 
-
 import React, { useState } from "react";
 import api from "../../../../api/api";
 import { useNavigate } from "react-router-dom";
@@ -222,7 +221,22 @@ function Login() {
     if (Object.keys(newErrors).length === 0) {
       try {
         const response = await api.post("/user/login", { email, password });
-        dispatch(login(response.data));
+        
+        // Transform the response to match what authSlice expects
+        const loginPayload = {
+          user: {
+            id: response.data._id,        // Map _id to id
+            _id: response.data._id,
+            firstname: response.data.firstname,
+            lastname: response.data.lastname,
+            email: response.data.email,
+            mobile: response.data.mobile,
+          },
+          token: response.data.token,
+          isLoggedIn: true
+        };
+        
+        dispatch(login(loginPayload));
         navigate("/home");
       } catch (error) {
         setServerError(error?.response?.data?.message || "Invalid email or password.");
@@ -230,12 +244,11 @@ function Login() {
     }
   };
 
-
   return (
     <div
       style={{
         minHeight: '100vh',
-        backgroundImage: 'linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url("https://images.unsplash.com/photo-1596462502278-27bfdc403348?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80")',
+        backgroundImage: 'linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url("/assets/slide1.png")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
@@ -397,8 +410,7 @@ function Login() {
           </p>
         </div>
 
-        <a
-          href="#"
+        <button
           style={{
             display: 'block',
             width: '100%',
@@ -420,9 +432,10 @@ function Login() {
             e.target.style.backgroundColor = 'transparent';
             e.target.style.color = '#999';
           }}
+          onClick={() => navigate("/register")}
         >
           Create account
-        </a>
+        </button>
       </div>
     </div>
   );
