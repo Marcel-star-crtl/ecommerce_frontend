@@ -1,4 +1,3 @@
-// authSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
 // Helper to safely parse user from localStorage
@@ -24,7 +23,6 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     login: (state, action) => {
-      // Expecting payload format: { token, refreshToken, user }
       if (!action.payload?.token || !action.payload?.user) {
         console.error("Invalid login payload structure", action.payload);
         return;
@@ -63,7 +61,6 @@ const authSlice = createSlice({
         state.refreshToken = localStorage.getItem("refreshToken");
         state.user = user;
       } else {
-        // Reset to logged out state if inconsistent
         state.isLoggedIn = false;
         state.token = null;
         state.refreshToken = null;

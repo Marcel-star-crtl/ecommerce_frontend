@@ -2,10 +2,8 @@ import { MDBCardImage, MDBCol, MDBRow } from "mdb-react-ui-kit";
 import React from "react";
 
 export default function OrderProduct({ product }) {
-  // Debug logging
   console.log("OrderProduct received product:", product);
 
-  // Handle case where product might be undefined
   if (!product) {
     return (
       <MDBRow className="justify-content-between">
@@ -16,9 +14,7 @@ export default function OrderProduct({ product }) {
     );
   }
 
-  // Handle different product data structures
   const getProductData = (product) => {
-    // If product has a 'product' property (populated from backend)
     if (product.product) {
       return {
         id: product.product._id || product.product.id,
@@ -30,7 +26,6 @@ export default function OrderProduct({ product }) {
       };
     }
     
-    // If product is directly the product data
     return {
       id: product._id || product.id,
       name: product.title || product.name,
@@ -43,7 +38,6 @@ export default function OrderProduct({ product }) {
 
   const productData = getProductData(product);
   
-  // Get the first image or use a placeholder
   const productImage = productData.images && productData.images.length > 0 
     ? productData.images[0] 
     : 'https://via.placeholder.com/150x150?text=No+Image';

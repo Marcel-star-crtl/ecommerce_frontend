@@ -1,59 +1,65 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../api/api";
 
-// export const fetchWishlist = createAsyncThunk(
-//   "wishlist/fetchWishlist",
-//   async ({ pageSize, page }, thunkAPI) => {
-//     try {
-//       const response = await api.get(`/user/wishlist`, {
-//         params: {
-//           page,
-//           size: pageSize,
-//         },
-//       });
-//       return new Promise((resolve) => {
-//         setTimeout(() => {
-//           if (response.data.length === 0) return resolve(false);
-//           resolve(response.data[0]);
-//         }, 500);
-//       });
-//     } catch (err) {
-//       return thunkAPI.rejectWithValue(err.message);
-//     }
-//   }
-// );
-
-// export const deleteWishlistProduct = createAsyncThunk(
-//   "wishlist/deleteProduct",
-//   async (id) => {
-//     const response = await api.delete(`/wishlist/product/${id}/`);
-//     return response.data.message;
-//   }
-// );
-
-
-// wishlistSlice.js
+// Fetch user's wishlist
 export const fetchWishlist = createAsyncThunk(
   "wishlist/fetchWishlist",
-  async (_, thunkAPI) => {
+  async ({ page = 1, size = 10 } = {}, thunkAPI) => {
     try {
-      const response = await api.get("/user/wishlist");
-      return {
-        products: response.data.products,
-        totalProductsCount: response.data.count
-      };
+      const response = await api.get(`/user/wishlist?page=${page}&size=${size}`);
+      return response.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || err.message);
     }
   }
 );
 
-export const deleteWishlistProduct = createAsyncThunk(
-  "wishlist/deleteProduct",
+// Add product to wishlist
+export const addToWishlist = createAsyncThunk(
+  "wishlist/addToWishlist",
   async (productId, thunkAPI) => {
     try {
-      await api.delete(`/user/wishlist`, { data: { productId } });
-      return productId;
+      const response = await api.post("/user/wishlist", { productId });
+      return { productId, message: response.data.message };
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+// Remove product from wishlist
+export const removeFromWishlist = createAsyncThunk(
+  "wishlist/removeFromWishlist",
+  async (productId, thunkAPI) => {
+    try { 
+      const response = await api.delete("/user/wishlist", { data: { productId } });
+      return { productId, message: response.data.message };
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+// Clear entire wishlist
+export const clearWishlist = createAsyncThunk(
+  "wishlist/clearWishlist",
+  async (_, thunkAPI) => {
+    try {
+      const response = await api.delete("/user/wishlist/clear");
+      return response.data.message;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+// Get wishlist count
+export const getWishlistCount = createAsyncThunk(
+  "wishlist/getWishlistCount",
+  async (_, thunkAPI) => {
+    try {
+      const response = await api.get("/user/wishlist/count");
+      return response.data.count;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || err.message);
     }
@@ -63,41 +69,108 @@ export const deleteWishlistProduct = createAsyncThunk(
 const wishlistSlice = createSlice({
   name: "wishlist",
   initialState: {
-    products: null,
+    products: [],
     fetchStatus: "idle",
-    deleteStatus: "idle",
+    addStatus: "idle",
+    removeStatus: "idle",
+    clearStatus: "idle",
     error: null,
     totalProductsCount: 0,
+    currentPage: 1,
+    totalPages: 1,
+    wishlistCount: 0,
   },
-  reducers: {},
+  reducers: {
+    resetWishlistStatus: (state) => {
+      state.addStatus = "idle";
+      state.removeStatus = "idle";
+      state.clearStatus = "idle";
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
+      // Fetch wishlist
       .addCase(fetchWishlist.pending, (state) => {
         state.fetchStatus = "loading";
         state.error = null;
       })
       .addCase(fetchWishlist.fulfilled, (state, action) => {
         state.fetchStatus = "succeeded";
-        state.products = action.payload.product_details.results;
-        state.totalProductsCount = action.payload.product_details.count;
+        if (action.payload.product_details) {
+          state.products = action.payload.product_details.results || [];
+          state.totalProductsCount = action.payload.product_details.count || 0;
+          state.currentPage = action.payload.product_details.page || 1;
+          state.totalPages = action.payload.product_details.pages || 1;
+        } else {
+          state.products = action.payload.products || [];
+          state.totalProductsCount = action.payload.count || 0;
+          state.currentPage = action.payload.page || 1;
+          state.totalPages = action.payload.pages || 1;
+        }
+        state.wishlistCount = state.totalProductsCount;
       })
       .addCase(fetchWishlist.rejected, (state, action) => {
         state.fetchStatus = "failed";
         state.error = action.payload;
       })
-      .addCase(deleteWishlistProduct.pending, (state) => {
-        state.deleteStatus = "loading";
+
+      // Add to wishlist
+      .addCase(addToWishlist.pending, (state) => {
+        state.addStatus = "loading";
         state.error = null;
       })
-      .addCase(deleteWishlistProduct.fulfilled, (state, action) => {
-        state.deleteStatus = "succeeded";
-        state.products = state.products.filter((p) => p.id !== action.meta.arg);
+      .addCase(addToWishlist.fulfilled, (state, action) => {
+        state.addStatus = "succeeded";
+        state.wishlistCount += 1;
       })
-      .addCase(deleteWishlistProduct.rejected, (state, action) => {
-        state.deleteStatus = "failed";
+      .addCase(addToWishlist.rejected, (state, action) => {
+        state.addStatus = "failed";
         state.error = action.payload;
+      })
+
+      // Remove from wishlist
+      .addCase(removeFromWishlist.pending, (state) => {
+        state.removeStatus = "loading";
+        state.error = null;
+      })
+      .addCase(removeFromWishlist.fulfilled, (state, action) => {
+        state.removeStatus = "succeeded";
+        state.products = state.products.filter(
+          (product) => product._id !== action.payload.productId
+        );
+        state.totalProductsCount = Math.max(0, state.totalProductsCount - 1);
+        state.wishlistCount = Math.max(0, state.wishlistCount - 1);
+      })
+      .addCase(removeFromWishlist.rejected, (state, action) => {
+        state.removeStatus = "failed";
+        state.error = action.payload;
+      })
+
+      // Clear wishlist
+      .addCase(clearWishlist.pending, (state) => {
+        state.clearStatus = "loading";
+        state.error = null;
+      })
+      .addCase(clearWishlist.fulfilled, (state) => {
+        state.clearStatus = "succeeded";
+        state.products = [];
+        state.totalProductsCount = 0;
+        state.wishlistCount = 0;
+        state.currentPage = 1;
+        state.totalPages = 1;
+      })
+      .addCase(clearWishlist.rejected, (state, action) => {
+        state.clearStatus = "failed";
+        state.error = action.payload;
+      })
+
+      // Get wishlist count
+      .addCase(getWishlistCount.fulfilled, (state, action) => {
+        state.wishlistCount = action.payload;
       });
   },
 });
 
+export const { resetWishlistStatus } = wishlistSlice.actions;
 export default wishlistSlice.reducer;

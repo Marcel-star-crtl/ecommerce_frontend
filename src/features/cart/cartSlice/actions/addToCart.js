@@ -1,7 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../../../api/api";
 
-// cartSlice.js (addToCart thunk)
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
   async ({ product, quantity }, thunkAPI) => {
@@ -11,7 +10,6 @@ export const addToCart = createAsyncThunk(
         return thunkAPI.rejectWithValue("Please login to add items to cart");
       }
 
-      // Fix: Ensure color is a string, not an array
       let color = product.color || "default";
       if (Array.isArray(color)) {
         color = color[0] || "default";
@@ -46,7 +44,6 @@ const pending = (state) => {
 const fulfilled = (state, action) => {
   state.addStatus = "succeeded";
   
-  // Match this with your actual backend response
   const addedProduct = action.payload.cart.products.find(
     p => p.product.toString() === action.meta.arg.product._id
   );

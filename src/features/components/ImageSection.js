@@ -9,7 +9,6 @@ const ImageSection = () => {
   return (
     <Box
       w="100%"
-      // maxW="1250px"
       width= "100%"
       mx="auto"
       borderRadius=""

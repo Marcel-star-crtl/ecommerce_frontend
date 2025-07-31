@@ -1,6 +1,26 @@
 import React from 'react';
 
-function BeautyComparison() {
+function BeautyComparison({ product }) {
+  const getImageUrl = (imageData) => {
+    if (!imageData) return null;
+    return imageData.url || imageData.image || null;
+  };
+
+  const beforeImage = product?.beforeAfterImages?.before 
+    ? getImageUrl(product.beforeAfterImages.before)
+    : (process.env.PUBLIC_URL + "/assets/before.png");
+    
+  const afterImage = product?.beforeAfterImages?.after 
+    ? getImageUrl(product.beforeAfterImages.after)
+    : (process.env.PUBLIC_URL + "/assets/after.png");
+
+  const productTitle = product?.title || product?.name || "Beauty Product";
+  
+  const mainBenefit = product?.benefits?.[0] || "No smudging or Flaking";
+  
+  const description = product?.description || 
+    "This beauty product line was creatively designed to emphasize the flawless beauty of mother nature. We crafted the logo and mixed two natural colors to provide a calm and soothing feeling to everyone who comes across the product.";
+
   return (
     <div style={{
       display: 'flex',
@@ -13,7 +33,6 @@ function BeautyComparison() {
       width: '100%',
       margin: '0 auto'
     }}>
-      {/* Before/After Images Section */}
       <div style={{
         display: 'flex',
         gap: '20px',
@@ -21,15 +40,14 @@ function BeautyComparison() {
         maxWidth: '1400px',
         alignItems: 'flex-start'
       }}>
-        {/* Before Image */}
         <div style={{
           position: 'relative',
           width: '320px',
           height: '380px'
         }}>
           <img
-            src={process.env.PUBLIC_URL + "/assets/before.png"}
-            alt="Before"
+            src={beforeImage}
+            alt="Before using product"
             style={{
               width: '100%',
               height: '100%',
@@ -54,15 +72,14 @@ function BeautyComparison() {
           </div>
         </div>
 
-        {/* After Image */}
         <div style={{
           position: 'relative',
           width: '320px',
           height: '380px'
         }}>
           <img
-            src={process.env.PUBLIC_URL + "/assets/after.png"}
-            alt="After"
+            src={afterImage}
+            alt="After using product"
             style={{
               width: '100%',
               height: '100%',
@@ -89,7 +106,6 @@ function BeautyComparison() {
         </div>
       </div>
 
-      {/* Text Content Section */}
       <div style={{
         flex: '1',
         maxWidth: '350px'
@@ -102,7 +118,7 @@ function BeautyComparison() {
           lineHeight: '1.3',
           margin: '0 0 20px 0'
         }}>
-          No smudging or Flaking
+          {mainBenefit}
         </h2>
         
         <p style={{
@@ -112,16 +128,40 @@ function BeautyComparison() {
           marginBottom: '40px',
           fontWeight: '400'
         }}>
-          This beauty product line was creatively designed to emphasize the flawless beauty of mother nature. We crafted the logo and mixed two natural colors to provide a calm and soothing feeling to everyone who comes across the product.
+          {description}
         </p>
 
-        {/* Progress Indicator */}
+        {product?.benefits && product.benefits.length > 1 && (
+          <div style={{ marginBottom: '30px' }}>
+            <h4 style={{
+              fontSize: '16px',
+              fontWeight: '500',
+              color: '#333',
+              marginBottom: '10px'
+            }}>
+              Key Benefits:
+            </h4>
+            <ul style={{
+              fontSize: '13px',
+              color: '#666',
+              lineHeight: '1.6',
+              paddingLeft: '20px',
+              margin: '0'
+            }}>
+              {product.benefits.slice(1, 4).map((benefit, index) => (
+                <li key={index} style={{ marginBottom: '5px' }}>
+                  {benefit}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <div style={{
           display: 'flex',
           alignItems: 'center',
           gap: '15px'
         }}>
-          {/* Progress Bar */}
           <div style={{
             flex: '1',
             height: '2px',
@@ -140,7 +180,6 @@ function BeautyComparison() {
             }}></div>
           </div>
 
-          {/* Page Counter */}
           <span style={{
             fontSize: '12px',
             color: '#999',
@@ -150,7 +189,6 @@ function BeautyComparison() {
             1 OF 10
           </span>
 
-          {/* Right Progress Bar */}
           <div style={{
             flex: '1',
             height: '2px',
@@ -164,3 +202,4 @@ function BeautyComparison() {
 }
 
 export default BeautyComparison;
+

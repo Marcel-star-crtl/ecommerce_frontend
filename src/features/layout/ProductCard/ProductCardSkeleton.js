@@ -53,7 +53,6 @@ function ProductCardSkeleton() {
 
           {/* Product Details Section Skeleton */}
           <div className="p-3" style={{ paddingTop: '20px', paddingBottom: '20px' }}>
-            {/* Product Name Skeleton */}
             <div 
               className="mb-2"
               style={{ 
@@ -64,7 +63,6 @@ function ProductCardSkeleton() {
               }}
             />
             
-            {/* Second line of title if needed */}
             <div 
               className="mb-3"
               style={{ 

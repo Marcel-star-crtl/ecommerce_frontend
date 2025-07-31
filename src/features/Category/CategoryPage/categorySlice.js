@@ -1,29 +1,25 @@
-// src/redux/slices/categorySlice.js (or wherever your categorySlice is)
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../../../api/api"; // Adjust path if needed
+import api from "../../../api/api"; 
 
-// New thunk to fetch products for a specific category with pagination
 export const fetchProductsByCategory = createAsyncThunk(
   "category/fetchProductsByCategory",
   async ({ categoryId, pageSize, page }, thunkAPI) => {
     try {
-      // *** FIX: Ensure 'pageSize' is sent as the query parameter name ***
       const response = await api.get(
         `/category/${categoryId}/products?pageSize=${pageSize}&page=${page}`
       );
-      return response.data; // This should now contain { products: [...], totalProductsCount: N, categoryName: "..." }
+      return response.data; 
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
   }
 );
 
-// Thunk to fetch all categories (used by DiscoverByCategory and HomePage)
 export const fetchAllCategories = createAsyncThunk(
   "categories/fetchAllCategories",
   async (_, thunkAPI) => {
     try {
-      const response = await api.get("/category/"); // Endpoint for all categories
+      const response = await api.get("/category/"); 
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
@@ -34,14 +30,12 @@ export const fetchAllCategories = createAsyncThunk(
 const categorySlice = createSlice({
   name: "category",
   initialState: {
-    // For CategoryPage (products by category)
     products: [],
     totalProductsCount: 0,
     currentCategoryName: null,
-    status: "idle", // status for products of a specific category
-    error: null, // error for products of a specific category
+    status: "idle", 
+    error: null, 
 
-    // For DiscoverByCategory and HomePage (all categories)
     allCategories: [],
     allCategoriesStatus: "idle",
     allCategoriesError: null,
@@ -49,14 +43,12 @@ const categorySlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Reducers for fetchProductsByCategory
       .addCase(fetchProductsByCategory.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })
       .addCase(fetchProductsByCategory.fulfilled, (state, action) => {
         state.status = "succeeded";
-        // *** FIX: Map backend response keys to frontend state keys ***
         state.products = action.payload.products || [];
         state.totalProductsCount = action.payload.totalProductsCount || 0;
         state.currentCategoryName = action.payload.categoryName || "Category";
@@ -65,7 +57,6 @@ const categorySlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       })
-      // Reducers for fetchAllCategories (no changes needed here from previous corrections)
       .addCase(fetchAllCategories.pending, (state) => {
         state.allCategoriesStatus = "loading";
         state.allCategoriesError = null;

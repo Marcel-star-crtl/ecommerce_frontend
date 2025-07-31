@@ -2,10 +2,12 @@ import React from 'react';
 import { Box, Text, Button, VStack, Container } from '@chakra-ui/react';
 
 const Original = ({
-  backgroundImage = '/placeholder-hero-bg.jpg',
+  backgroundImage,
   title = 'Original Shyneen Facial Cleaner',
   description = 'This beauty product line was creatively designed to emphasize the flawless beauty of mother nature.',
   buttonText = 'Get Yours',
+  textColor = 'gray.800',
+  descriptionColor = 'gray.700', 
   onButtonClick = () => {}
 }) => {
   return (
@@ -15,14 +17,13 @@ const Original = ({
       marginBottom="70px"
       height="90vh"
       width="100%"
-      backgroundImage={process.env.PUBLIC_URL + "/assets/original.png"}
+      backgroundImage={backgroundImage}
       backgroundSize="cover"
       backgroundPosition="center"
       backgroundRepeat="no-repeat"
       display="flex"
       overflow="hidden"
     >
-      {/* Overlay for better text readability */}
       <Box
         position="absolute"
         top="0"
@@ -38,9 +39,8 @@ const Original = ({
         position="relative" 
         zIndex="2"
         display="flex"
-        alignItems="flex-end" // This aligns content to bottom
+        alignItems="flex-end"
         height="100%"
-        // pb={{ base: 8, md: 16 }} 
       >
         <VStack
           align="flex-start"
@@ -52,7 +52,7 @@ const Original = ({
           <Text
             fontSize={{ base: '2xl', md: '3xl', lg: '4xl' }}
             fontWeight="bold"
-            color="gray.800"
+            color={textColor}
             lineHeight="1.2"
             letterSpacing="-0.02em"
           >
@@ -61,7 +61,7 @@ const Original = ({
 
           <Text
             fontSize={{ base: 'sm', md: 'md' }}
-            color="gray.700"
+            color={descriptionColor}
             lineHeight="1.6"
             maxW="400px"
           >

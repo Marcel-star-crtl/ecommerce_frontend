@@ -1,60 +1,13 @@
-// import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-// import api from "../../../api/api";
-
-// export const fetchCategories = createAsyncThunk(
-//   "category/fetchCategories",
-//   async () => {
-//     // TODO: with sizeLimit = 4
-//     const response = await api.get(`/category`);
-//     return response.data;
-//   }
-// );
-
-// const categoriesSlice = createSlice({
-//   name: "categories",
-//   initialState: {
-//     categories: [],
-//     status: "idle",
-//     error: null,
-//   },
-//   reducers: {},
-//   extraReducers: (builder) => {
-//     builder
-//       .addCase(fetchCategories.pending, (state) => {
-//         state.status = "loading";
-//       })
-//       .addCase(fetchCategories.fulfilled, (state, action) => {
-//         state.status = "succeeded";
-//         state.categories = action.payload;
-//       })
-//       .addCase(fetchCategories.rejected, (state, action) => {
-//         state.status = "failed";
-//         state.error = action.error.message;
-//       });
-//   },
-// });
-
-// export default categoriesSlice.reducer;
-
-
-
-
-
-
-
-
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import api from '../../../api/api'
 
-// Base URL for your API
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
-// Async thunk to fetch all categories
 export const fetchCategories = createAsyncThunk(
   'categories/fetchCategories',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/category`);
+      const response = await api.get('/category');
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -64,12 +17,11 @@ export const fetchCategories = createAsyncThunk(
   }
 );
 
-// Async thunk to fetch a single category with its products
 export const fetchCategory = createAsyncThunk(
   'categories/fetchCategory',
   async (categoryId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/category/${categoryId}`);
+      const response = await api.get(`/category/${categoryId}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -79,13 +31,12 @@ export const fetchCategory = createAsyncThunk(
   }
 );
 
-// Async thunk to fetch products by category
 export const fetchCategoryProducts = createAsyncThunk(
   'categories/fetchCategoryProducts',
   async ({ categoryId, page = 1, size = 10 }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/category/${categoryId}/products?page=${page}&size=${size}`
+      const response = await api.get(
+        `/category/${categoryId}/products?page=${page}&size=${size}`
       );
       return response.data;
     } catch (error) {

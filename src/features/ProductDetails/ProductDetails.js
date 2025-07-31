@@ -23,7 +23,6 @@ export default function Product() {
   const [img, setImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
-  // Define the correct Cloudinary cloud name
   const CLOUDINARY_CLOUD_NAME = 'ddlhwv65t';
 
   useEffect(() => {
@@ -64,7 +63,6 @@ export default function Product() {
     setQuantity($event.quantity);
   };
 
-  // Function to get the correct Cloudinary URL
   const getCloudinaryUrl = (imageUrl) => {
     if (!imageUrl) return '';
     const urlParts = imageUrl.split('/');
@@ -72,10 +70,13 @@ export default function Product() {
     return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/${imageId}`;
   };
 
-  // ProductDetails.js (handleAddToCart function)
+  const getImageUrl = (imageData) => {
+    if (!imageData) return 'https://via.placeholder.com/400x500/f5f3f0/999999?text=Product+Image';
+    return imageData.url || getCloudinaryUrl(imageData.image) || 'https://via.placeholder.com/400x500/f5f3f0/999999?text=Product+Image';
+  };
+
   const handleAddToCart = async () => {
     try {
-      // Fix: Ensure color is a string, not an array
       let color = product.color || "default";
       if (Array.isArray(color)) {
         color = color[0] || "default";
@@ -91,10 +92,8 @@ export default function Product() {
 
       if (addToCart.fulfilled.match(result)) {
         console.log('Product added to cart successfully');
-        // Show success notification
       } else if (addToCart.rejected.match(result)) {
         console.error('Failed to add to cart:', result.payload);
-        // Show error notification
       }
     } catch (error) {
       console.error('Add to cart error:', {
@@ -109,21 +108,19 @@ export default function Product() {
     <div style={{ backgroundColor: '#ffffff', minHeight: '100vh' }}>
       <div className="container-fluid" style={{ maxWidth: '1400px', margin: '70px auto', padding: '0px' }}>
         
-        {/* Main Product Section - Hero Area */}
         <div className="row g-0">
-          {/* Left Side - Product Images Grid */}
           <div className="col-lg-6">
             <div className="row g-0" style={{ height: '70vh' }}>
-              {/* Main Featured Image - Left Column (spans 2 rows) */}
-              <div className="col-8">
+              <div className="col-8" style={{ padding: '0' }}>
                 <div 
                   className="d-flex align-items-center justify-content-center position-relative h-100"
                   style={{ 
                     backgroundColor: '#f5f3f0',
-                    background: 'linear-gradient(135deg, #f5f3f0 0%, #e8e2db 100%)'
+                    background: 'linear-gradient(135deg, #f5f3f0 0%, #e8e2db 100%)',
+                    padding: '0',
+                    margin: '0'
                   }}
                 >
-                  {/* Heart Icon - Top Left */}
                   <div 
                     className="position-absolute"
                     style={{ 
@@ -135,45 +132,44 @@ export default function Product() {
                     <ButtonWishList product={product} />
                   </div>
 
-                  {/* Main Product Image */}
-                  <div className="text-center">
-                    <MDBCardImage
-                      src={product.images?.length ? getCloudinaryUrl(product.images[img]?.image) || product.images[0]?.url : 'https://via.placeholder.com/400x500/f5f3f0/999999?text=Product+Image'}
-                      alt={product.name}
-                      style={{ 
-                        maxWidth: '350px',
-                        maxHeight: '450px',
-                        objectFit: 'contain',
-                        filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.1))',
-                        cursor: 'pointer'
-                      }}
-                      onClick={() => changeImageOnClick(0)}
-                    />
-                  </div>
+                  <MDBCardImage
+                    src={product.images?.length ? getImageUrl(product.images[img]) : 'https://via.placeholder.com/400x500/f5f3f0/999999?text=Product+Image'}
+                    alt={product.title || product.name}
+                    style={{ 
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.1))',
+                      cursor: 'pointer',
+                      display: 'block'
+                    }}
+                    onClick={() => changeImageOnClick(0)}
+                  />
                 </div>
               </div>
 
-              {/* Right Column - Two Smaller Images */}
-              <div className="col-4">
+              <div className="col-4" style={{ padding: '0' }}>
                 <div className="d-flex flex-column h-100">
-                  {/* Top Small Image */}
-                  <div className="flex-fill">
+                  <div className="flex-fill" style={{ padding: '0', margin: '0' }}>
                     <div 
                       className="d-flex align-items-center justify-content-center h-100 position-relative cursor-pointer"
                       style={{ 
                         backgroundColor: '#e8ddd4',
-                        borderBottom: '1px solid #ffffff'
+                        borderBottom: '1px solid #ffffff',
+                        padding: '0',
+                        margin: '0'
                       }}
                       onClick={() => changeImageOnClick(1)}
                     >
                       <MDBCardImage
-                        src={product.images?.length > 1 ? getCloudinaryUrl(product.images[2]?.image) || product.images[2]?.url : 'https://via.placeholder.com/200x200/e8ddd4/999999?text=Image+2'}
+                        src={product.images?.length > 1 ? getImageUrl(product.images[1]) : 'https://via.placeholder.com/200x200/e8ddd4/999999?text=Image+2'}
                         alt="Product view 2"
                         style={{ 
-                          maxWidth: '120px',
-                          maxHeight: '150px',
-                          objectFit: 'contain',
-                          transition: 'transform 0.3s ease'
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          transition: 'transform 0.3s ease',
+                          display: 'block'
                         }}
                         onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
                         onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
@@ -181,23 +177,25 @@ export default function Product() {
                     </div>
                   </div>
 
-                  {/* Bottom Small Image */}
-                  <div className="flex-fill">
+                  <div className="flex-fill" style={{ padding: '0', margin: '0' }}>
                     <div 
                       className="d-flex align-items-center justify-content-center h-100 position-relative cursor-pointer"
                       style={{ 
-                        backgroundColor: '#d4b5a0'
+                        backgroundColor: '#d4b5a0',
+                        padding: '0',
+                        margin: '0'
                       }}
                       onClick={() => changeImageOnClick(2)}
                     >
                       <MDBCardImage
-                        src={product.images?.length > 2 ? getCloudinaryUrl(product.images[3]?.image) || product.images[3]?.url : 'https://via.placeholder.com/200x200/d4b5a0/999999?text=Image+3'}
+                        src={product.images?.length > 2 ? getImageUrl(product.images[2]) : 'https://via.placeholder.com/200x200/d4b5a0/999999?text=Image+3'}
                         alt="Product view 3"
                         style={{ 
-                          maxWidth: '120px',
-                          maxHeight: '150px',
-                          objectFit: 'contain',
-                          transition: 'transform 0.3s ease'
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          transition: 'transform 0.3s ease',
+                          display: 'block'
                         }}
                         onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
                         onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
@@ -209,11 +207,9 @@ export default function Product() {
             </div>
           </div>
 
-          {/* Right Side - Product Details */}
           <div className="col-lg-6">
             <div className="p-4" style={{ minHeight: '70vh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
               
-              {/* Brand/Category */}
               <div className="mb-2">
                 <span
                   style={{ 
@@ -224,11 +220,10 @@ export default function Product() {
                     letterSpacing: '1px'
                   }}
                 >
-                  {product.category?.name || 'Body & Hand Toner'}
+                  {product.category?.name || product.category?.title || product.brand || 'Body & Hand Toner'}
                 </span>
               </div>
 
-              {/* Product Name */}
               <h1 
                 className="mb-3"
                 style={{ 
@@ -244,7 +239,6 @@ export default function Product() {
                 {product.name || product.title || 'Shyneen Face Toner'}
               </h1>
 
-              {/* Description */}
               <p 
                 className="mb-4"
                 style={{ 
@@ -258,7 +252,6 @@ export default function Product() {
                 {product.description || 'This beauty product line was creatively designed to emphasize the flawless beauty of mother nature.'}
               </p>
 
-              {/* Price */}
               <div className="mb-4">
                 <div className="d-flex align-items-baseline">
                   <h2 
@@ -283,17 +276,28 @@ export default function Product() {
                 </div>
               </div>
 
-              {/* Error message for cart */}
+              {product.quantity !== undefined && (
+                <div className="mb-3">
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      color: product.quantity > 10 ? '#28a745' : product.quantity > 0 ? '#ffc107' : '#dc3545',
+                      fontWeight: '500'
+                    }}
+                  >
+                    {product.quantity > 10 ? 'In Stock' : product.quantity > 0 ? `Only ${product.quantity} left` : 'Out of Stock'}
+                  </span>
+                </div>
+              )}
+
               {cartError && (
                 <div className="alert alert-danger mb-3" role="alert">
                   {cartError}
                 </div>
               )}
 
-              {/* Quantity and Add to Cart */}
               <div className="mb-4">
                 <div className="d-flex align-items-center gap-3">
-                  {/* Quantity Selector */}
                   <div className="d-flex align-items-center border rounded" style={{ backgroundColor: '#ffffff' }}>
                     <button 
                       className="btn btn-sm border-0"
@@ -312,12 +316,12 @@ export default function Product() {
                       className="btn btn-sm border-0"
                       style={{ fontSize: '16px', color: '#666666', padding: '8px 12px' }}
                       onClick={() => setQuantity(quantity + 1)}
+                      disabled={product.quantity && quantity >= product.quantity}
                     >
                       +
                     </button>
                   </div>
 
-                  {/* Add to Cart Button */}
                   <button
                     className="btn flex-grow-1"
                     style={{
@@ -328,118 +332,65 @@ export default function Product() {
                       fontWeight: '500',
                       padding: '12px 24px',
                       borderRadius: '4px',
-                      opacity: addStatus === 'loading' ? 0.7 : 1
+                      opacity: addStatus === 'loading' || (product.quantity !== undefined && product.quantity === 0) ? 0.7 : 1
                     }}
                     onClick={handleAddToCart}
-                    disabled={addStatus === 'loading'}
+                    disabled={addStatus === 'loading' || (product.quantity !== undefined && product.quantity === 0)}
                   >
-                    {addStatus === 'loading' ? 'Adding...' : 'Add to Cart'}
+                    {addStatus === 'loading' ? 'Adding...' : 
+                     (product.quantity !== undefined && product.quantity === 0) ? 'Out of Stock' : 'Add to Cart'}
                   </button>
                 </div>
               </div>
 
-              {/* Expandable Sections */}
-              <div className="mt-0">
-                {/* How To Use */}
-                <div className="border-bottom pb-3">
-                  <div 
-                    className="d-flex justify-content-between align-items-center cursor-pointer"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => {/* Toggle functionality */}}
-                  >
-                    <span style={{ fontSize: '14px', color: '#333333', fontWeight: '500' }}>
-                      How To Use
-                    </span>
-                    <span style={{ fontSize: '18px', color: '#666666' }}>×</span>
-                  </div>
-                  <div className="mt-2">
-                    <p style={{ fontSize: '12px', color: '#666666', lineHeight: '1.5', margin: '0' }}>
-                      This beauty product line was creatively designed to emphasize the flawless beauty of mother nature. natural colors to provide a calm and soothing feeling to everyone who comes across the product.
-                    </p>
-                  </div>
+              {(product.skinType || product.size || product.applicationMethod) && (
+                <div className="mb-4">
+                  {product.skinType && (
+                    <div className="mb-2">
+                      <small style={{ color: '#666666' }}>
+                        <strong>Skin Type:</strong> {product.skinType}
+                      </small>
+                    </div>
+                  )}
+                  {product.size && (
+                    <div className="mb-2">
+                      <small style={{ color: '#666666' }}>
+                        <strong>Size:</strong> {product.size}
+                      </small>
+                    </div>
+                  )}
+                  {product.applicationMethod && (
+                    <div className="mb-2">
+                      <small style={{ color: '#666666' }}>
+                        <strong>Application:</strong> {product.applicationMethod}
+                      </small>
+                    </div>
+                  )}
                 </div>
-
-                {/* Ingredients */}
-                <div className="border-bottom py-3">
-                  <div 
-                    className="d-flex justify-content-between align-items-center cursor-pointer"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => {/* Toggle functionality */}}
-                  >
-                    <span style={{ fontSize: '14px', color: '#333333', fontWeight: '500' }}>
-                      Ingridients
-                    </span>
-                    <span style={{ fontSize: '18px', color: '#666666' }}>×</span>
-                  </div>
-                  <div className="mt-2">
-                    <p style={{ fontSize: '12px', color: '#666666', lineHeight: '1.5', margin: '0' }}>
-                      This beauty product line was creatively designed to emphasize the flawless beauty of mother nature. We crafted the logo and mixed two natural colors to provide a calm and soothing feeling to everyone who comes across the product, natural colors to provide a calm and soothing feeling to everyone who comes across the product.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Production Process */}
-                <div className="py-3">
-                  <div 
-                    className="d-flex justify-content-between align-items-center cursor-pointer"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => {/* Toggle functionality */}}
-                  >
-                    <span style={{ fontSize: '14px', color: '#333333', fontWeight: '500' }}>
-                      Production Process
-                    </span>
-                    <span style={{ fontSize: '18px', color: '#666666' }}>+</span>
-                  </div>
-                </div>
-              </div>
+              )}
 
             </div>
           </div>
         </div>
 
-        {/* Secondary Image */}
-        {/* <div className="row g-0">
-          <div className="col-12">
-            <div 
-              className="d-flex align-items-center justify-content-center"
-              style={{ 
-                minHeight: '50vh',
-                backgroundColor: '#d4b5a0',
-                background: 'linear-gradient(135deg, #d4b5a0 0%, #c9a892 100%)'
-              }}
-            >
-              <MDBCardImage
-                src={product.images?.length > 1 ? getCloudinaryUrl(product.images[1]?.image) || product.images[1]?.url : 'https://via.placeholder.com/600x300/d4b5a0/ffffff?text=Product+Usage'}
-                alt="Product usage"
-                style={{ 
-                  maxWidth: '600px',
-                  maxHeight: '300px',
-                  objectFit: 'contain',
-                  filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.1))'
-                }}
-              />
-            </div>
-          </div>
-        </div> */}
-
-        {/* How to Use Section */}
-        <div className="row g-0" style={{backgroundColor: '#f8f8f8'}}>
-          <div className="col-lg-6">
+        <div className="row g-0" style={{backgroundColor: '#f8f8f8', marginTop: '80px'}}>
+          <div className="col-lg-6" style={{ padding: '0' }}>
             <div 
               className="d-flex align-items-center justify-content-center"
               style={{ 
                 minHeight: '60vh',
-                padding: '0'
+                padding: '0',
+                margin: '0'
               }}
             >
               <MDBCardImage
-                src={process.env.PUBLIC_URL + "/assets/details1.png"}
-                alt="Face toner application"
+                src={product.detailsImage ? getImageUrl(product.detailsImage) : (process.env.PUBLIC_URL + "/assets/details1.png")}
+                alt="Product details"
                 style={{ 
                   width: '100%',
-                  height: '100%',
+                  height: '60vh',
                   objectFit: 'cover',
-                  minHeight: '60vh'
+                  display: 'block'
                 }}
               />
             </div>
@@ -455,7 +406,6 @@ export default function Product() {
               }}
             >
               <div style={{ maxWidth: '400px' }}>
-                {/* Small header */}
                 <p 
                   style={{ 
                     fontSize: '11px',
@@ -470,7 +420,6 @@ export default function Product() {
                   HOW TO USE
                 </p>
 
-                {/* Main product title */}
                 <h2 
                   style={{ 
                     fontSize: '28px',
@@ -482,60 +431,114 @@ export default function Product() {
                     textTransform: 'uppercase'
                   }}
                 >
-                  SHYNEEN FACE TONER
+                  {product.title || product.name || 'SHYNEEN FACE TONER'}
                 </h2>
 
-                {/* How To Use subsection */}
-                <div style={{ marginBottom: '30px' }}>
-                  <h4 
-                    style={{ 
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      color: '#000000',
-                      marginBottom: '8px',
-                      textTransform: 'none'
-                    }}
-                  >
-                    How To Use
-                  </h4>
-                  <p 
-                    style={{ 
+                {product.howToUse && (
+                  <div style={{ marginBottom: '30px' }}>
+                    <h4 
+                      style={{ 
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: '#000000',
+                        marginBottom: '8px',
+                        textTransform: 'none'
+                      }}
+                    >
+                      How To Use
+                    </h4>
+                    <p 
+                      style={{ 
+                        fontSize: '13px',
+                        color: '#888888',
+                        lineHeight: '1.6',
+                        marginBottom: '0'
+                      }}
+                    >
+                      {product.howToUse}
+                    </p>
+                  </div>
+                )}
+
+                {product.ingredients && (
+                  <div style={{ marginBottom: '30px' }}>
+                    <h4 
+                      style={{ 
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: '#000000',
+                        marginBottom: '8px',
+                        textTransform: 'none'
+                      }}
+                    >
+                      Ingredients
+                    </h4>
+                    <p 
+                      style={{ 
+                        fontSize: '13px',
+                        color: '#888888',
+                        lineHeight: '1.6',
+                        marginBottom: '0'
+                      }}
+                    >
+                      {product.ingredients}
+                    </p>
+                  </div>
+                )}
+                {product.keyFeatures && product.keyFeatures.length > 0 && (
+                  <div style={{ marginBottom: '30px' }}>
+                    <h4 
+                      style={{ 
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: '#000000',
+                        marginBottom: '8px',
+                        textTransform: 'none'
+                      }}
+                    >
+                      Key Features
+                    </h4>
+                    <ul style={{ 
                       fontSize: '13px',
                       color: '#888888',
                       lineHeight: '1.6',
+                      paddingLeft: '20px',
                       marginBottom: '0'
-                    }}
-                  >
-                    This beauty product line was creatively designed to emphasize the flawless beauty of mother nature.
-                  </p>
-                </div>
+                    }}>
+                      {product.keyFeatures.map((feature, index) => (
+                        <li key={index} style={{ marginBottom: '4px' }}>{feature}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
-                {/* Ingredients subsection */}
-                <div style={{ marginBottom: '30px' }}>
-                  <h4 
-                    style={{ 
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      color: '#000000',
-                      marginBottom: '8px',
-                      textTransform: 'none'
-                    }}
-                  >
-                    Ingredients
-                  </h4>
-                  <p 
-                    style={{ 
+                {product.benefits && product.benefits.length > 0 && (
+                  <div style={{ marginBottom: '30px' }}>
+                    <h4 
+                      style={{ 
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: '#000000',
+                        marginBottom: '8px',
+                        textTransform: 'none'
+                      }}
+                    >
+                      Benefits
+                    </h4>
+                    <ul style={{ 
                       fontSize: '13px',
                       color: '#888888',
                       lineHeight: '1.6',
+                      paddingLeft: '20px',
                       marginBottom: '0'
-                    }}
-                  >
-                    This beauty product line was creatively designed to emphasize the flawless beauty of mother nature. We crafted the logo and mixed two natural colors to provide a calm and soothing feeling to everyone who comes across the product.
-                  </p>
-                </div>
+                    }}>
+                      {product.benefits.map((benefit, index) => (
+                        <li key={index} style={{ marginBottom: '4px' }}>{benefit}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
-                {/* Production Process subsection */}
                 <div style={{ marginBottom: '30px' }}>
                   <h4 
                     style={{ 
@@ -552,23 +555,23 @@ export default function Product() {
                   </h4>
                 </div>
 
-                {/* Main description */}
-                <p 
-                  style={{ 
-                    fontSize: '13px',
-                    color: '#666666',
-                    lineHeight: '1.7',
-                    marginTop: '20px'
-                  }}
-                >
-                  This beauty product line was creatively designed to emphasize the flawless beauty of mother nature. We crafted the logo and mixed two natural colors to provide a calm and soothing feeling to everyone who comes across the product.
-                </p>
+                {!product.howToUse && !product.ingredients && (
+                  <p 
+                    style={{ 
+                      fontSize: '13px',
+                      color: '#666666',
+                      lineHeight: '1.7',
+                      marginTop: '20px'
+                    }}
+                  >
+                    {product.description || 'This beauty product line was creatively designed to emphasize the flawless beauty of mother nature. We crafted the logo and mixed two natural colors to provide a calm and soothing feeling to everyone who comes across the product.'}
+                  </p>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Production Process Section */}
         <div className="row g-0">
           <div className="col-lg-6">
             <div className="p-5 d-flex align-items-center" style={{ minHeight: '60vh', backgroundColor: '#ffffff' }}>
@@ -598,58 +601,85 @@ export default function Product() {
                 >
                   PRODUCTION PROCESS
                 </h3>
-                <p 
-                  style={{ 
-                    fontSize: '14px',
-                    color: '#666666',
-                    lineHeight: '1.8',
-                    maxWidth: '400px',
-                    marginBottom: '20px'
-                  }}
-                >
-                  This beauty product line was creatively designed to emphasize the flawless beauty of mother nature. We crafted the logo and mixed two natural colors to provide a calm and soothing feeling to everyone who comes across the product.
-                </p>
-                <p 
-                  style={{ 
-                    fontSize: '14px',
-                    color: '#666666',
-                    lineHeight: '1.8',
-                    maxWidth: '400px',
-                    marginBottom: '20px'
-                  }}
-                >
-                  This beauty product line was creatively designed to emphasize the flawless beauty of mother nature. We crafted the logo and mixed two natural colors to provide a calm and soothing feeling to everyone who comes across the product.
-                </p>
-                <p 
-                  style={{ 
+                
+                {product.productionProcess ? (
+                  <div style={{ 
                     fontSize: '14px',
                     color: '#666666',
                     lineHeight: '1.8',
                     maxWidth: '400px'
-                  }}
-                >
-                  This beauty product line was creatively designed to emphasize the flawless beauty of mother nature. We crafted the logo and mixed two natural colors to provide a calm and soothing feeling to everyone who comes across the product.
-                </p>
+                  }}>
+                    {product.productionProcess.split('\n').map((paragraph, index) => (
+                      <p key={index} style={{ marginBottom: '20px' }}>
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+                ) : (
+                  <>
+                    <p 
+                      style={{ 
+                        fontSize: '14px',
+                        color: '#666666',
+                        lineHeight: '1.8',
+                        maxWidth: '400px',
+                        marginBottom: '20px'
+                      }}
+                    >
+                      This beauty product line was creatively designed to emphasize the flawless beauty of mother nature. We crafted the logo and mixed two natural colors to provide a calm and soothing feeling to everyone who comes across the product.
+                    </p>
+                    <p 
+                      style={{ 
+                        fontSize: '14px',
+                        color: '#666666',
+                        lineHeight: '1.8',
+                        maxWidth: '400px',
+                        marginBottom: '20px'
+                      }}
+                    >
+                      Our production process ensures the highest quality standards while maintaining the natural essence of our ingredients.
+                    </p>
+                    <p 
+                      style={{ 
+                        fontSize: '14px',
+                        color: '#666666',
+                        lineHeight: '1.8',
+                        maxWidth: '400px'
+                      }}
+                    >
+                      Each product is carefully crafted to deliver exceptional results while being gentle on your skin.
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           </div>
-          <div className="col-lg-6">
+          <div className="col-lg-6" style={{ padding: '0' }}>
             <div 
               style={{ 
-                minHeight: '60vh',
-                backgroundImage: 'url("https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80")',
+                height: '60vh',
+                backgroundImage: product.productionImage ? 
+                  `url("${getImageUrl(product.productionImage)}")` : 
+                  'url("https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80")',
                 backgroundSize: 'cover',
-                backgroundPosition: 'center'
+                backgroundPosition: 'center',
+                margin: '0'
               }}
             >
             </div>
           </div>
         </div>
 
-        {/* Before/After Section */}
-        <BeautyComparison />
+        {product.beforeAfterImages && product.beforeAfterImages.before && product.beforeAfterImages.after ? (
+          <BeautyComparison 
+            beforeImage={getImageUrl(product.beforeAfterImages.before)}
+            afterImage={getImageUrl(product.beforeAfterImages.after)}
+            product={product}
+          />
+        ) : (
+          <BeautyComparison product={product} />
+        )}
 
-        {/* Trending Products Section */}
         <div className="row g-0">
           <div className="col-12">
             <div className="p-5" style={{ backgroundColor: '#ffffff' }}>
@@ -665,7 +695,7 @@ export default function Product() {
               >
                 Trending Products
               </h3>
-              <RelatedProduct categoryId={product.category?.id} />
+              <RelatedProduct categoryId={product.category?._id || product.category?.id} />
             </div>
           </div>
         </div>
@@ -676,3 +706,4 @@ export default function Product() {
     </div>
   );
 }
+

@@ -3,7 +3,6 @@ import React from 'react';
 const Philosophy = () => {
   return (
     <div className="bg-white">
-      {/* Top Section with Image and Brand Philosophy */}
       <div className="flex flex-col lg:flex-row">
         {/* Left Image */}
         <div className="lg:w-1/2">
