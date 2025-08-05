@@ -417,7 +417,8 @@ function Home() {
           <h5 className={`${styles.sectionTitle} position-relative mx-xl-5 mb-4`}>
             <span className="p-3 ps-0" style={{
               color: "#000", 
-              fontSize: windowWidth <= 480 ? '14px' : '16px'
+              fontSize: windowWidth <= 480 ? '14px' : '16px',
+              fontWeight: '300'
             }}>
               A gently formationA gently formationA gently formation
             </span>
@@ -498,7 +499,8 @@ function Home() {
           <h5 className={`${styles.sectionTitle} position-relative mx-xl-5 mb-4`}>
             <span className="p-3 ps-0" style={{
               color: "#000", 
-              fontSize: windowWidth <= 480 ? '14px' : '16px'
+              fontSize: windowWidth <= 480 ? '14px' : '16px',
+              fontWeight: '300'
             }}>
               A gently formationA gently formationA gently formation
             </span>

@@ -44,7 +44,7 @@ const fulfilled = (state, action) => {
   state.products = payload.products || [];
   state.cartId = payload.id || null;
   state.cartCount = Array.isArray(payload.products) 
-    ? payload.products.reduce((acc, el) => acc + (el.quantity || 1), 0)
+    ? payload.products.reduce((acc, el) => acc + (el.quantity || el.count || 1), 0)
     : 0;
   state.totalPrice = payload.total_price || 0;
 };

@@ -43,28 +43,8 @@ const pending = (state) => {
 
 const fulfilled = (state, action) => {
   state.addStatus = "succeeded";
-  
-  const addedProduct = action.payload.cart.products.find(
-    p => p.product.toString() === action.meta.arg.product._id
-  );
-  
-  if (addedProduct) {
-    const existingProduct = state.products.find(
-      p => p.id === action.meta.arg.product.id
-    );
-    
-    if (existingProduct) {
-      existingProduct.quantity += action.meta.arg.quantity;
-    } else {
-      state.products.push({
-        ...action.meta.arg.product,
-        quantity: addedProduct.count
-      });
-    }
-    
-    state.cartCount += action.meta.arg.quantity;
-    state.totalPrice = action.payload.cart.cartTotal;
-  }
+  // Don't manually update cart state here - let fetchCart() handle it
+  // This prevents race conditions and ensures consistency with backend
 };
 
 const rejected = (state, action) => {

@@ -13,6 +13,7 @@ import { Link, useParams } from "react-router-dom";
 import ButtonWishList from "../layout/btn/btnwishlist";
 import RelatedProduct from "./relatedProduct";
 import { MDBCardImage, MDBRipple } from "mdb-react-ui-kit";
+import { fetchCart } from "../cart/cartSlice";
 
 export default function Product() {
   const { id } = useParams();
@@ -81,7 +82,7 @@ export default function Product() {
       if (Array.isArray(color)) {
         color = color[0] || "default";
       }
-
+  
       const result = await dispatch(addToCart({
         product: {
           ...product,
@@ -89,9 +90,11 @@ export default function Product() {
         },
         quantity: quantity
       }));
-
+  
       if (addToCart.fulfilled.match(result)) {
         console.log('Product added to cart successfully');
+        // Fetch the updated cart to ensure UI is in sync
+        await dispatch(fetchCart());
       } else if (addToCart.rejected.match(result)) {
         console.error('Failed to add to cart:', result.payload);
       }
