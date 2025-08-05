@@ -13,6 +13,9 @@ import {
   decrementProductHandlers,
 } from "./actions/decrementCartProduct";
 import { addToCart, addToCartHandlers } from "./actions/addToCart";
+import { applyCoupon, applyCouponHandlers } from "./actions/applyCoupon";
+import { emptyCart, emptyCartHandlers } from "./actions/emptyCart";
+import { createCashOrder, createOrderHandlers } from "./actions/createOrder";
 
 const cartSlice = createSlice({
   name: "cart",
@@ -21,11 +24,17 @@ const cartSlice = createSlice({
     cartId: null,
     cartCount: 0,
     totalPrice: null,
+    totalAfterDiscount: null,
+    appliedCoupon: null,
+    lastOrder: null,
     fetchStatus: "idle",
     addStatus: "idle",
     deleteStatus: "idle",
     incrementStatus: "idle",
     decrementStatus: "idle",
+    couponStatus: "idle",
+    emptyStatus: "idle",
+    orderStatus: "idle",
     error: null,
   },
   reducers: {},
@@ -52,6 +61,15 @@ const cartSlice = createSlice({
       .addCase(addToCart.pending, addToCartHandlers.pending)
       .addCase(addToCart.fulfilled, addToCartHandlers.fulfilled)
       .addCase(addToCart.rejected, addToCartHandlers.rejected)
+      .addCase(applyCoupon.pending, applyCouponHandlers.pending)
+      .addCase(applyCoupon.fulfilled, applyCouponHandlers.fulfilled)
+      .addCase(applyCoupon.rejected, applyCouponHandlers.rejected)
+      .addCase(emptyCart.pending, emptyCartHandlers.pending)
+      .addCase(emptyCart.fulfilled, emptyCartHandlers.fulfilled)
+      .addCase(emptyCart.rejected, emptyCartHandlers.rejected)
+      .addCase(createCashOrder.pending, createOrderHandlers.pending)
+      .addCase(createCashOrder.fulfilled, createOrderHandlers.fulfilled)
+      .addCase(createCashOrder.rejected, createOrderHandlers.rejected)
       .addCase(resetCart, (state) => {
         state.products = [];
         state.cartId = null;
@@ -62,6 +80,12 @@ const cartSlice = createSlice({
         state.deleteStatus = "idle";
         state.incrementStatus = "idle";
         state.decrementStatus = "idle";
+        state.couponStatus = "idle";
+        state.emptyStatus = "idle";
+        state.orderStatus = "idle";
+        state.totalAfterDiscount = null;
+        state.appliedCoupon = null;
+        state.lastOrder = null;
         state.error = null;
       });
   },
@@ -75,5 +99,8 @@ export {
   deleteCartProduct,
   incrementCartProduct,
   decrementCartProduct,
+  applyCoupon,
+  emptyCart,
+  createCashOrder,
 };
 export default cartSlice.reducer;

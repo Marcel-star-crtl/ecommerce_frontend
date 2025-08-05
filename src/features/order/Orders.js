@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchOrders } from "./ordersSlice";
 import { logout } from "../auth/authSlice";
 import { Link, useNavigate } from "react-router-dom";
+import { cartAPI, userAPI } from '../../api/api';
+import Loader from '../../components/Loader/Loader';
 import {
   Box,
   Container,
@@ -67,6 +69,16 @@ export default function Orders() {
     }
   }, [dispatch, isLoggedIn, userId]);
 
+  // Fetch all orders (admin only) if user is admin
+  const fetchAllOrders = async () => {
+    try {
+      const response = await cartAPI.getAllOrders();
+      console.log('All orders:', response.data);
+    } catch (error) {
+      console.error('Error fetching all orders:', error);
+    }
+  };
+
   useEffect(() => {
     // Update form data when user data changes
     setFormData({
@@ -97,26 +109,7 @@ export default function Orders() {
     }));
   };
 
-  const handleSave = async () => {
-    try {
-      setEditMode(false);
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
-    } catch (error) {
-      toast({
-        title: "Error updating profile",
-        description: error.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-  };
+
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -313,7 +306,7 @@ export default function Orders() {
                 size="sm"
                 _hover={{ bg: "gray.800" }}
                 px={6}
-                onClick={handleSave}
+                onClick={handleUpdateProfile}
               >
                 Save
               </Button>
@@ -1023,18 +1016,64 @@ export default function Orders() {
     </VStack>
   );
 
+  // Enhanced order management functions
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    try {
+      await cartAPI.updateOrderStatus(orderId, newStatus);
+      // Refresh orders after update
+      dispatch(fetchOrders({ userId, timestamp: Date.now() }));
+      toast({
+        title: "Order status updated",
+        description: `Order status changed to ${newStatus}`,
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: "Error updating order",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const handleUpdateProfile = async () => {
+    try {
+      await userAPI.updateProfile({
+        firstname: formData.firstname,
+        lastname: formData.lastname,
+        mobile: formData.mobile
+      });
+      
+      if (formData.address !== user?.address) {
+        await userAPI.saveAddress(formData.address);
+      }
+      
+      setEditMode(false);
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been updated successfully",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: "Error updating profile",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
   // Loading state
   if (status === 'loading') {
-    return (
-      <Container maxW="6xl" py={8} bg={bgColor} minH="100vh">
-        <Flex justify="center" align="center" h="50vh">
-          <VStack spacing={4}>
-            <Spinner size="xl" color="pink.500" />
-            <Text color="gray.600">Loading your orders...</Text>
-          </VStack>
-        </Flex>
-      </Container>
-    );
+    return <Loader fullScreen />;
   }
 
   // Error state

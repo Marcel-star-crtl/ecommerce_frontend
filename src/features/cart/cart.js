@@ -3,7 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import CheckoutButton from "./CheckoutButton";
 
-import { deleteCartProduct, fetchCart, incrementCartProduct, decrementCartProduct } from './cartSlice';
+import { deleteCartProduct, fetchCart, incrementCartProduct, decrementCartProduct, applyCoupon, emptyCart } from './cartSlice';
+import Loader from '../../components/Loader/Loader';
 
 function Cart() {
   const dispatch = useDispatch();
@@ -13,10 +14,14 @@ function Cart() {
     cartId, 
     cartCount, 
     totalPrice,
+    totalAfterDiscount,
+    appliedCoupon,
     fetchStatus,
     incrementStatus,
     decrementStatus,
     deleteStatus,
+    couponStatus,
+    emptyStatus,
     error
   } = useSelector((state) => state.cart);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -24,6 +29,7 @@ function Cart() {
   const componentRef = useRef(null);
   const [height, setHeight] = useState(0);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
 
   const CLOUDINARY_CLOUD_NAME = 'ddlhwv65t';
 
@@ -62,9 +68,10 @@ function Cart() {
     setIsUpdating(
       incrementStatus === 'loading' || 
       decrementStatus === 'loading' || 
-      deleteStatus === 'loading'
+      deleteStatus === 'loading' ||
+      emptyStatus === 'loading'
     );
-  }, [incrementStatus, decrementStatus, deleteStatus]);
+  }, [incrementStatus, decrementStatus, deleteStatus, emptyStatus]);
 
   const updateQuantity = async (id, newQuantity) => {
     if (isUpdating) return; 
@@ -114,6 +121,8 @@ function Cart() {
     return sum + (price * quantity);
   }, 0) || 0);
   
+  const finalTotal = totalAfterDiscount || subtotal;
+  
   const shipping = 0;
   const tax = subtotal * 0.08;
   const total = subtotal + shipping + tax;
@@ -125,18 +134,29 @@ function Cart() {
 
   const navigate = useNavigate();
 
+  const handleApplyCoupon = async () => {
+    if (couponCode.trim()) {
+      try {
+        await dispatch(applyCoupon(couponCode)).unwrap();
+        setCouponCode('');
+      } catch (error) {
+        console.error('Error applying coupon:', error);
+      }
+    }
+  };
+
+  const handleEmptyCart = async () => {
+    if (window.confirm('Are you sure you want to empty your cart?')) {
+      try {
+        await dispatch(emptyCart()).unwrap();
+      } catch (error) {
+        console.error('Error emptying cart:', error);
+      }
+    }
+  };
+
   if (fetchStatus === 'loading') {
-    return (
-      <div style={{
-        minHeight: '100vh',
-        backgroundColor: '#f8f9fa',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div>Loading cart...</div>
-      </div>
-    );
+    return <Loader fullScreen />;
   }
 
   if (fetchStatus === 'failed' && error) {
@@ -290,15 +310,19 @@ function Cart() {
             alignItems: 'center',
             gap: '20px'
           }}>
-            <button style={{
-              background: 'none',
-              border: 'none',
-              fontSize: '14px',
-              color: '#666',
-              cursor: 'pointer',
-              textDecoration: 'underline'
-            }}>
-              Share
+            <button 
+              onClick={handleEmptyCart}
+              disabled={isUpdating || !products?.length}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '14px',
+                color: isUpdating || !products?.length ? '#ccc' : '#dc3545',
+                cursor: isUpdating || !products?.length ? 'not-allowed' : 'pointer',
+                textDecoration: 'underline'
+              }}
+            >
+              {emptyStatus === 'loading' ? 'Emptying...' : 'Empty Cart'}
             </button>
             <div style={{
               fontSize: '14px',
@@ -566,30 +590,57 @@ function Cart() {
                 <input
                   type="text"
                   placeholder="Coupon Code"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                  disabled={couponStatus === 'loading'}
                   style={{
                     flex: 1,
                     padding: '8px 12px',
                     border: '1px solid #ddd',
                     fontSize: '14px',
-                    outline: 'none'
+                    outline: 'none',
+                    opacity: couponStatus === 'loading' ? 0.6 : 1
                   }}
                 />
                 <button
+                  onClick={handleApplyCoupon}
+                  disabled={!couponCode.trim() || couponStatus === 'loading'}
                   style={{
                     padding: '8px 16px',
-                    backgroundColor: '#E8A5C4',
+                    backgroundColor: (!couponCode.trim() || couponStatus === 'loading') ? '#ccc' : '#E8A5C4',
                     color: 'white',
                     border: 'none',
                     fontSize: '14px',
-                    cursor: 'pointer',
+                    cursor: (!couponCode.trim() || couponStatus === 'loading') ? 'not-allowed' : 'pointer',
                     transition: 'background-color 0.2s'
                   }}
-                  onMouseOver={(e) => e.target.style.backgroundColor = '#E298BC'}
-                  onMouseOut={(e) => e.target.style.backgroundColor = '#E8A5C4'}
+                  onMouseOver={(e) => {
+                    if (!e.target.disabled) {
+                      e.target.style.backgroundColor = '#E298BC';
+                    }
+                  }}
+                  onMouseOut={(e) => {
+                    if (!e.target.disabled) {
+                      e.target.style.backgroundColor = '#E8A5C4';
+                    }
+                  }}
                 >
-                  Apply
+                  {couponStatus === 'loading' ? 'Applying...' : 'Apply'}
                 </button>
               </div>
+              
+              {appliedCoupon && (
+                <div style={{
+                  backgroundColor: '#d4edda',
+                  color: '#155724',
+                  padding: '8px 12px',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  marginBottom: '15px'
+                }}>
+                  Coupon "{appliedCoupon}" applied successfully!
+                </div>
+              )}
 
               <div style={{
                 paddingBottom: '15px',
@@ -619,6 +670,19 @@ function Cart() {
                     Free
                   </span>
                 </div>
+                
+                {totalAfterDiscount && totalAfterDiscount < subtotal && (
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginBottom: '12px'
+                  }}>
+                    <span style={{ fontSize: '14px', color: '#28a745' }}>Discount</span>
+                    <span style={{ fontSize: '14px', color: '#28a745', fontWeight: '500' }}>
+                      -${(subtotal - totalAfterDiscount).toFixed(2)}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div style={{
@@ -630,7 +694,7 @@ function Cart() {
                   Total ({itemCount} items)
                 </span>
                 <span style={{ fontSize: '16px', fontWeight: '500', color: '#333' }}>
-                  ${subtotal.toFixed(2)}
+                  ${finalTotal.toFixed(2)}
                 </span>
               </div>
 

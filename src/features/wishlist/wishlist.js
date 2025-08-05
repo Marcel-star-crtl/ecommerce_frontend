@@ -6,6 +6,8 @@ import {
   clearWishlist,
   resetWishlistStatus,
 } from "./wishlistSlice";
+import { userAPI } from '../../api/api';
+import Loader from '../../components/Loader/Loader';
 
 export default function Wishlist() {
   const dispatch = useDispatch();
@@ -87,7 +89,10 @@ export default function Wishlist() {
   const deleteItem = async (productId) => {
     setRemovingProductId(productId);
     try {
-      await dispatch(removeFromWishlist(productId)).unwrap();
+      // Use the API directly for better control
+      await userAPI.removeFromWishlist(productId);
+      // Refresh the wishlist after removal
+      dispatch(fetchWishlist({ page, size: pageSize }));
     } catch (error) {
       console.error("Failed to remove from wishlist:", error);
     } finally {
@@ -95,8 +100,14 @@ export default function Wishlist() {
     }
   };
 
-  const addToCart = (product) => {
-    console.log("Adding to cart:", product);
+  const addToCart = async (product) => {
+    try {
+      // Add to cart logic here - you can import and use cart actions
+      console.log("Adding to cart:", product);
+      // Example: dispatch(addToCart({ productId: product._id, quantity: 1 }));
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+    }
   };
 
   const toggleWishlist = (productId) => {
@@ -105,9 +116,19 @@ export default function Wishlist() {
     }
   };
 
-  const handleClearWishlist = () => {
+  const handleClearWishlist = async () => {
     if (window.confirm("Are you sure you want to clear your entire wishlist?")) {
-      dispatch(clearWishlist());
+      try {
+        // Clear all items one by one since there's no bulk clear endpoint
+        for (const product of products) {
+          await userAPI.removeFromWishlist(product._id);
+        }
+        // Refresh the wishlist
+        dispatch(fetchWishlist({ page: 1, size: pageSize }));
+        setPage(1);
+      } catch (error) {
+        console.error('Error clearing wishlist:', error);
+      }
     }
   };
 
@@ -330,25 +351,7 @@ export default function Wishlist() {
 
         {/* Loading State */}
         {fetchStatus === "loading" && (
-          <div
-            style={{
-              height: "350px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <div
-              style={{
-                border: "3px solid #f3f3f3",
-                borderTop: "3px solid #E8A5C4",
-                borderRadius: "50%",
-                width: "40px",
-                height: "40px",
-                animation: "spin 1s linear infinite",
-              }}
-            ></div>
-          </div>
+          <Loader size="large" />
         )}
 
         {/* Products List */}

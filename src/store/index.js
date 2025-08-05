@@ -10,7 +10,10 @@ import ordersSlice from "../features/order/ordersSlice";
 import productHomePageSlice from "../features/home/productHomePageSlice";
 import shopsReducer from "../features/shops/shopsSlice";
 import bestSellersReducer from '../features/ProductDetails/bestSellersSlice';
-import videoReducer from '../slices/videoSlice'; 
+import videoReducer from '../slices/videoSlice';
+import brandSlice from '../features/admin/brandSlice';
+import colorSlice from '../features/admin/colorSlice';
+import couponSlice from '../features/admin/couponSlice'; 
 
 const store = configureStore({
   reducer: {
@@ -26,6 +29,9 @@ const store = configureStore({
     shops: shopsReducer,
     bestSellers: bestSellersReducer,
     video: videoReducer,
+    brands: brandSlice,
+    colors: colorSlice,
+    coupons: couponSlice,
   },
 });
 

@@ -1,8 +1,13 @@
 import React from 'react'
+import FAQ from '../components/FAQ'
+import BeautyComparison from '../components/BeautyComparison'
 
 const storesPage = () => {
   return (
-    <div style={{height: '80vh'}}>stores</div>
+    <>
+    <FAQ />
+    <BeautyComparison />
+    </>
   )
 }
 
