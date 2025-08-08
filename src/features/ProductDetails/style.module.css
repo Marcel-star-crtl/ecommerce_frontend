@@ -168,6 +168,242 @@
 .social i {
   color: #c2c2c2;
 }
+/* Mobile First Responsive Design */
+@media (max-width: 767px) {
+  .container {
+    padding: 10px 5px 20px 5px;
+  }
+
+  .container .card {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  }
+
+  .container .form {
+    flex-direction: column;
+  }
+
+  .container .card .rightside {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .container .card .leftside {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .images {
+    flex-direction: column-reverse;
+    margin-top: 10px;
+    gap: 10px;
+  }
+
+  .images span {
+    height: auto;
+    max-height: 300px;
+  }
+
+  .images span img {
+    max-height: 280px;
+    object-fit: contain;
+    width: 100%;
+  }
+
+  .img_left {
+    flex-direction: row !important;
+    gap: 8px !important;
+    justify-content: center;
+    overflow-x: auto;
+    padding: 5px 0;
+  }
+
+  .img_left span {
+    height: 60px !important;
+    width: 60px !important;
+    flex-shrink: 0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .img_left i {
+    transform: rotate(-90deg);
+    font-size: 12px;
+  }
+
+  /* Right side mobile adjustments */
+  .rightside h3 {
+    margin-top: 15px;
+    font-size: 1.4rem;
+  }
+
+  .rightside h4 {
+    margin-top: 15px;
+    font-size: 1.1rem;
+  }
+
+  .designer {
+    margin-top: 15px;
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+
+  .description p {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 8px;
+  }
+
+  .options {
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+    align-items: center;
+  }
+
+  .quantity {
+    width: 120px;
+    height: 44px; /* Better touch target */
+  }
+
+  .options button {
+    width: 100%;
+    max-width: 280px;
+    padding: 12px;
+    font-size: 14px;
+    min-height: 44px; /* Better touch target */
+    border-radius: 6px;
+  }
+
+  .open_wish {
+    margin-top: 15px;
+    justify-content: center;
+  }
+
+  .social {
+    margin-top: 15px;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .social i {
+    font-size: 18px;
+    padding: 10px;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+  }
+
+  .features li {
+    font-size: 13px;
+    margin-left: 15px;
+    line-height: 1.5;
+    margin-bottom: 5px;
+  }
+
+  .topdiv {
+    font-size: 12px;
+    justify-content: center;
+  }
+}
+
+/* Tablet styles */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .container .card {
+    max-width: 95%;
+  }
+
+  .images span {
+    height: 400px;
+  }
+
+  .img_left span {
+    height: 100px !important;
+    width: 70px !important;
+  }
+
+  .options {
+    gap: 15px;
+  }
+}
+
+/* Small tablet - stack layout */
+@media (max-width: 900px) and (min-width: 768px) {
+  .container .form {
+    flex-direction: column;
+  }
+
+  .container .card .rightside,
+  .container .card .leftside {
+    width: 100%;
+  }
+
+  .images {
+    margin-top: 15px;
+  }
+
+  .images span {
+    height: 350px;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .container {
+    padding: 5px 2px 15px 2px;
+  }
+
+  .container .card .rightside,
+  .container .card .leftside {
+    padding: 12px;
+  }
+
+  .rightside h3 {
+    font-size: 1.2rem;
+  }
+
+  .rightside h4 {
+    font-size: 1rem;
+  }
+
+  .images span {
+    max-height: 250px;
+  }
+
+  .img_left span {
+    height: 50px !important;
+    width: 50px !important;
+  }
+
+  .quantity {
+    width: 100px;
+    height: 40px;
+  }
+
+  .options button {
+    padding: 10px;
+    font-size: 13px;
+    min-height: 40px;
+    max-width: 100%;
+  }
+
+  .description p {
+    font-size: 13px;
+  }
+
+  .features li {
+    font-size: 12px;
+  }
+}
+
+/* Old media query - keeping original fallback */
 @media (max-width: 750px) {
   .container .card {
     max-width: 80%;

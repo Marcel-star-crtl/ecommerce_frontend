@@ -1,6 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 function BeautyComparison({ product }) {
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Responsive values
+  const isMobile = windowWidth <= 767;
+  const isTablet = windowWidth >= 768 && windowWidth <= 1023;
+  const isDesktop = windowWidth >= 1024;
+
   const getImageUrl = (imageData) => {
     if (!imageData) return null;
     return imageData.url || imageData.image || null;
@@ -24,26 +37,36 @@ function BeautyComparison({ product }) {
   return (
     <div style={{
       display: 'flex',
-      alignItems: 'center',
-      padding: ' 0px 0px',
-      marginTop: '50px',
+      flexDirection: isMobile ? 'column' : 'row',
+      alignItems: isMobile ? 'stretch' : 'center',
+      padding: isMobile ? '30px 20px' : isTablet ? '40px 30px' : '50px 40px',
+      marginTop: isMobile ? '30px' : '50px',
       backgroundColor: '#f8f8f8',
       fontFamily: 'Arial, sans-serif',
-      gap: '60px',
+      gap: isMobile ? '30px' : isTablet ? '40px' : '60px',
       width: '100%',
-      margin: '0 auto'
+      margin: '0 auto',
+      minHeight: isMobile ? 'auto' : '500px'
     }}>
+      {/* Images Container */}
       <div style={{
         display: 'flex',
-        gap: '20px',
-        padding: ' 40px',
-        maxWidth: '1400px',
-        alignItems: 'flex-start'
+        flexDirection: isMobile ? 'column' : 'row',
+        gap: isMobile ? '20px' : '20px',
+        padding: isMobile ? '0' : '20px',
+        maxWidth: isMobile ? '100%' : isTablet ? '600px' : '800px',
+        alignItems: isMobile ? 'center' : 'flex-start',
+        width: isMobile ? '100%' : 'auto',
+        justifyContent: isMobile ? 'center' : 'flex-start'
       }}>
+        {/* Before Image */}
         <div style={{
           position: 'relative',
-          width: '320px',
-          height: '380px'
+          width: isMobile ? 'min(280px, 90vw)' : isTablet ? '260px' : '320px',
+          height: isMobile ? 'min(320px, calc(90vw * 1.14))' : isTablet ? '300px' : '380px',
+          borderRadius: isMobile ? '15px' : '20px',
+          overflow: 'hidden',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
         }}>
           <img
             src={beforeImage}
@@ -56,26 +79,31 @@ function BeautyComparison({ product }) {
           />
           <div style={{
             position: 'absolute',
-            top: '15px',
+            top: isMobile ? '12px' : '15px',
             left: '50%',
             transform: 'translateX(-50%)',
             backgroundColor: '#E8A5C4',
             color: 'white',
-            padding: '6px 16px',
-            borderRadius: '15px',
-            fontSize: '12px',
+            padding: isMobile ? '5px 12px' : '6px 16px',
+            borderRadius: isMobile ? '12px' : '15px',
+            fontSize: isMobile ? '10px' : '12px',
             fontWeight: '500',
             textTransform: 'uppercase',
-            letterSpacing: '0.5px'
+            letterSpacing: '0.5px',
+            boxShadow: '0 2px 8px rgba(232, 165, 196, 0.3)'
           }}>
             Before
           </div>
         </div>
 
+        {/* After Image */}
         <div style={{
           position: 'relative',
-          width: '320px',
-          height: '380px'
+          width: isMobile ? 'min(280px, 90vw)' : isTablet ? '260px' : '320px',
+          height: isMobile ? 'min(320px, calc(90vw * 1.14))' : isTablet ? '300px' : '380px',
+          borderRadius: isMobile ? '15px' : '20px',
+          overflow: 'hidden',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
         }}>
           <img
             src={afterImage}
@@ -89,66 +117,71 @@ function BeautyComparison({ product }) {
           />
           <div style={{
             position: 'absolute',
-            top: '15px',
+            top: isMobile ? '12px' : '15px',
             left: '50%',
             transform: 'translateX(-50%)',
             backgroundColor: '#E8A5C4',
             color: 'white',
-            padding: '6px 20px',
-            borderRadius: '15px',
-            fontSize: '12px',
+            padding: isMobile ? '5px 14px' : '6px 20px',
+            borderRadius: isMobile ? '12px' : '15px',
+            fontSize: isMobile ? '10px' : '12px',
             fontWeight: '500',
             textTransform: 'uppercase',
-            letterSpacing: '0.5px'
+            letterSpacing: '0.5px',
+            boxShadow: '0 2px 8px rgba(232, 165, 196, 0.3)'
           }}>
             After
           </div>
         </div>
       </div>
 
+      {/* Content Container */}
       <div style={{
         flex: '1',
-        maxWidth: '350px'
+        maxWidth: isMobile ? '100%' : isTablet ? '400px' : '450px',
+        padding: isMobile ? '20px 0' : '0',
+        textAlign: isMobile ? 'center' : 'left'
       }}>
         <h2 style={{
-          fontSize: '28px',
+          fontSize: isMobile ? '22px' : isTablet ? '26px' : '28px',
           fontWeight: '400',
           color: '#333',
-          marginBottom: '20px',
+          marginBottom: isMobile ? '15px' : '20px',
           lineHeight: '1.3',
-          margin: '0 0 20px 0'
+          margin: isMobile ? '0 0 15px 0' : '0 0 20px 0'
         }}>
           {mainBenefit}
         </h2>
         
         <p style={{
-          fontSize: '14px',
-          lineHeight: '1.6',
+          fontSize: isMobile ? '13px' : '14px',
+          lineHeight: isMobile ? '1.5' : '1.6',
           color: '#666',
-          marginBottom: '40px',
-          fontWeight: '400'
+          marginBottom: isMobile ? '25px' : '30px',
+          fontWeight: '400',
+          maxWidth: '100%'
         }}>
           {description}
         </p>
 
         {product?.benefits && product.benefits.length > 1 && (
-          <div style={{ marginBottom: '30px' }}>
+          <div style={{ marginBottom: isMobile ? '20px' : '30px' }}>
             <h4 style={{
-              fontSize: '16px',
+              fontSize: isMobile ? '14px' : '16px',
               fontWeight: '500',
               color: '#333',
-              marginBottom: '10px'
+              marginBottom: isMobile ? '8px' : '10px'
             }}>
               Key Benefits:
             </h4>
             <ul style={{
-              fontSize: '13px',
+              fontSize: isMobile ? '12px' : '13px',
               color: '#666',
               lineHeight: '1.6',
-              paddingLeft: '20px',
+              paddingLeft: isMobile ? '16px' : '20px',
               margin: '0'
             }}>
-              {product.benefits.slice(1, 4).map((benefit, index) => (
+              {product.benefits.slice(1, isMobile ? 3 : 4).map((benefit, index) => (
                 <li key={index} style={{ marginBottom: '5px' }}>
                   {benefit}
                 </li>
@@ -157,10 +190,12 @@ function BeautyComparison({ product }) {
           </div>
         )}
 
+        {/* Progress Indicator */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '15px'
+          gap: isMobile ? '10px' : '15px',
+          marginTop: 'auto'
         }}>
           <div style={{
             flex: '1',
@@ -181,7 +216,7 @@ function BeautyComparison({ product }) {
           </div>
 
           <span style={{
-            fontSize: '12px',
+            fontSize: isMobile ? '10px' : '12px',
             color: '#999',
             fontWeight: '400',
             whiteSpace: 'nowrap'

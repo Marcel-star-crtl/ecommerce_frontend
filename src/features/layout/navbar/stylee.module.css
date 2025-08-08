@@ -1,6 +1,14 @@
 .logo {
   width: 120px;
 }
+
+/* Mobile responsive logo */
+@media (max-width: 767px) {
+  .logo {
+    width: 80px;
+  }
+}
+
 .top {
   background-color: #f5f5f5;
 }
@@ -66,6 +74,7 @@
   right: 1%;
   color: black;
 }
+
 .i {
   color: black;
 }
@@ -85,11 +94,191 @@ i:hover {
 nav a {
   color: white !important;
 }
+
 .dropdownMenu li span {
   color: black !important;
 }
+
+/* Responsive Navbar Styles */
 @media screen and (max-width: 1000px) {
   .ulNavbar a {
     color: black !important;
+  }
+}
+
+/* Mobile First Responsive Design */
+@media screen and (max-width: 767px) {
+  .navbar {
+    padding: 8px 0 !important;
+  }
+
+  .navbar .container-fluid {
+    padding: 0 12px !important;
+  }
+
+  /* Logo adjustments */
+  .navbar-brand span {
+    font-size: 18px !important;
+    letter-spacing: 2px !important;
+  }
+
+  /* Icon container spacing on mobile */
+  .navbar .icons-container {
+    gap: 12px !important;
+  }
+
+  /* Individual icon button styling */
+  .navbar .icon-button {
+    min-width: 40px !important;
+    min-height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 6px !important;
+    transition: background-color 0.2s !important;
+  }
+
+  .navbar .icon-button:active {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* SVG icon sizing for mobile */
+  .navbar .icon-button svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  /* Badge adjustments for mobile */
+  .navbar .icon-badge {
+    top: -6px !important;
+    right: -6px !important;
+    font-size: 9px !important;
+    min-width: 14px !important;
+    height: 14px !important;
+  }
+
+  /* Mobile menu button specific styling */
+  .navbar .mobile-menu-toggle {
+    min-width: 40px !important;
+    min-height: 40px !important;
+    margin-left: 4px !important;
+  }
+
+  /* Search bar mobile styles */
+  .search-container {
+    padding: 12px 12px !important;
+  }
+
+  .search-container .form-select {
+    flex-basis: 100px !important;
+    font-size: 13px !important;
+  }
+
+  .search-container .form-control {
+    font-size: 13px !important;
+  }
+
+  /* Search results mobile optimization */
+  .search-results {
+    left: 12px !important;
+    right: 12px !important;
+    transform: none !important;
+    max-width: none !important;
+    width: calc(100vw - 24px) !important;
+  }
+
+  /* Mobile menu styles */
+  .offcanvas {
+    width: 280px !important;
+  }
+
+  .offcanvas-body .d-flex {
+    padding: 0 !important;
+  }
+
+  .offcanvas-body a,
+  .offcanvas-body button {
+    padding: 14px 0 !important;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 15px !important;
+    min-height: 48px !important;
+  }
+
+  .offcanvas-body hr {
+    margin: 8px 0 !important;
+  }
+}
+
+/* Tablet styles */
+@media screen and (max-width: 1023px) and (min-width: 768px) {
+  .navbar .container-fluid {
+    padding: 0 12px;
+  }
+
+  .navbar-brand span {
+    font-size: 22px;
+    letter-spacing: 3px;
+  }
+
+  /* Navigation links spacing on tablet */
+  .navbar-nav .d-flex {
+    gap: 2rem;
+  }
+
+  .navbar-nav .nav-link {
+    padding: 6px 12px !important;
+  }
+}
+
+/* Large screen optimizations */
+@media screen and (min-width: 1200px) {
+  .navbar .container-fluid {
+    max-width: 1400px;
+    padding: 0 20px;
+  }
+
+  .navbar-nav .d-flex {
+    gap: 2.5rem;
+  }
+
+  .navbar-nav .nav-link {
+    padding: 8px 20px !important;
+  }
+}
+
+/* Touch target improvements */
+@media (hover: none) and (pointer: coarse) {
+  .btn,
+  .nav-link {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-link {
+    min-width: auto;
+    padding: 12px 16px !important;
+  }
+}
+
+/* Reduce animations on mobile for better performance */
+@media screen and (max-width: 767px) {
+  * {
+    transition: none !important;
+    animation-duration: 0s !important;
+  }
+
+  .navbar * {
+    transition: background-color 0.2s, color 0.2s, transform 0.1s !important;
+  }
+}
+
+/* Fix for iOS input zoom */
+@supports (-webkit-touch-callout: none) {
+  .form-control,
+  .form-select {
+    font-size: 16px !important;
   }
 }

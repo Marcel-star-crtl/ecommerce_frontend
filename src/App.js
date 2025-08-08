@@ -24,6 +24,7 @@ import Aboutus from "./features/aboutus/Aboutus";
 import CheckoutPage from './features/checkout/CheckoutPage';
 import SuccessPage from './features/checkout/SuccessPage';
 import { fetchCart } from "./features/cart/cartSlice";
+import Loader from "./components/Loader/Loader";
 
 import NewArrivals from "./features/new-arrivals/NewArrivals";
 import SkinCare from "./features/skin-care/SkinCare";
@@ -41,6 +42,7 @@ AOS.init();
 function App() {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const isLoading = useSelector((state) => state.loader.isLoading);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -50,6 +52,7 @@ function App() {
 
   return (
     <BrowserRouter basename={process.env.REACT_APP_BASE_NAME || "/"}>
+      {isLoading && <Loader fullScreen />}
       <Navbar />
       <Routes>
         <Route path="/">

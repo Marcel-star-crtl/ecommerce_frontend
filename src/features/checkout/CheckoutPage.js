@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createOrder } from '../order/ordersSlice';
 import { useSelector, useDispatch } from 'react-redux';
-import api from '../../api/api'; 
+import api, { mobileMoneyAPI } from '../../api/api'; 
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -125,8 +125,37 @@ const CheckoutPage = () => {
       alert('Please accept the terms and conditions');
       return;
     }
+
+    // Validate mobile money phone number
+    if ((formData.paymentMethod === 'mobile_money_mtn' || formData.paymentMethod === 'mobile_money_orange') && !formData.phoneNumber) {
+      alert('Please provide a phone number for mobile money payment');
+      return;
+    }
   
     try {
+      let paymentResult = null;
+
+      // Handle mobile money payment first
+      if (formData.paymentMethod === 'mobile_money_mtn' || formData.paymentMethod === 'mobile_money_orange') {
+        const provider = formData.paymentMethod === 'mobile_money_mtn' ? 'mtn' : 'orange';
+        
+        const paymentData = {
+          amount: totalPay,
+          phoneNumber: formData.phoneNumber,
+          provider: provider,
+          currency: 'XAF' // Default currency, can be made configurable
+        };
+
+        // Initiate mobile money payment
+        const paymentResponse = await mobileMoneyAPI.initiate(paymentData);
+        
+        if (!paymentResponse.success) {
+          throw new Error(paymentResponse.message || 'Mobile money payment failed');
+        }
+
+        paymentResult = paymentResponse.data;
+      }
+
       const orderData = {
         cartId,
         products: cartProducts.map(item => ({
@@ -147,7 +176,12 @@ const CheckoutPage = () => {
           address: formData.address,
           postalCode: formData.postalCode
         },
-        paymentMethod: formData.paymentMethod
+        paymentMethod: formData.paymentMethod,
+        paymentDetails: paymentResult ? {
+          transactionId: paymentResult.transactionId,
+          provider: paymentResult.provider,
+          status: paymentResult.status
+        } : null
       };
   
       const resultAction = await dispatch(createOrder(orderData));
@@ -157,7 +191,8 @@ const CheckoutPage = () => {
           state: { 
             orderId: resultAction.payload.orderId,
             amount: totalPay,
-            paymentMethod: formData.paymentMethod
+            paymentMethod: formData.paymentMethod,
+            paymentDetails: paymentResult
           } 
         });
       } else {
@@ -169,8 +204,17 @@ const CheckoutPage = () => {
     }
   };
 
+  const { incrementCartProduct, decrementCartProduct } = require('../cart/cartSlice/index');
+  const dispatchCart = useDispatch();
   const updateQuantity = (productId, newQuantity) => {
-    console.log('Update quantity:', productId, newQuantity);
+    const item = cartProducts.find(i => (i.id || i._id) === productId);
+    if (!item) return;
+    const currentQuantity = item.quantity || 1;
+    if (newQuantity > currentQuantity) {
+      dispatchCart(incrementCartProduct(productId));
+    } else if (newQuantity < currentQuantity && currentQuantity > 1) {
+      dispatchCart(decrementCartProduct(productId));
+    }
   };
 
   return (
@@ -453,8 +497,6 @@ const CheckoutPage = () => {
 
               {/* Payment Method */}
               <section style={{ marginBottom: '30px' }}>
-                {/* Payment Method Selection */}
-                <section style={{ marginBottom: '30px' }}>
                 <h2 style={{
                     fontSize: '18px',
                     fontWeight: '600',
@@ -467,49 +509,215 @@ const CheckoutPage = () => {
                 </h2>
                 
                 <div style={{ marginBottom: '20px' }}>
+                    {/* Cash on Delivery */}
                     <label style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '15px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    marginBottom: '10px',
-                    cursor: 'pointer',
-                    backgroundColor: formData.paymentMethod === 'cod' ? '#f8f9ff' : 'white'
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '15px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        marginBottom: '10px',
+                        cursor: 'pointer',
+                        backgroundColor: formData.paymentMethod === 'cod' ? '#f8f9ff' : 'white'
                     }}>
-                    <input 
-                        type="radio" 
-                        name="paymentMethod" 
-                        value="cod" 
-                        checked={formData.paymentMethod === 'cod'} 
-                        onChange={handleChange}
-                        style={{ marginRight: '10px' }}
-                    />
-                    <span style={{ fontWeight: '500' }}>Cash on Delivery</span>
+                        <input 
+                            type="radio" 
+                            name="paymentMethod" 
+                            value="cod" 
+                            checked={formData.paymentMethod === 'cod'} 
+                            onChange={handleChange}
+                            style={{ marginRight: '10px' }}
+                        />
+                        <span style={{ fontWeight: '500' }}>Cash on Delivery</span>
+                    </label>
+
+                    {/* MTN Mobile Money */}
+                    <label style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '15px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        marginBottom: '10px',
+                        cursor: 'pointer',
+                        backgroundColor: formData.paymentMethod === 'mobile_money_mtn' ? '#f8f9ff' : 'white'
+                    }}>
+                        <input 
+                            type="radio" 
+                            name="paymentMethod" 
+                            value="mobile_money_mtn" 
+                            checked={formData.paymentMethod === 'mobile_money_mtn'} 
+                            onChange={handleChange}
+                            style={{ marginRight: '10px' }}
+                        />
+                        <div>
+                            <span style={{ fontWeight: '500' }}>MTN Mobile Money</span>
+                            <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
+                                Pay with your MTN Mobile Money account
+                            </div>
+                        </div>
+                    </label>
+
+                    {/* Orange Money */}
+                    <label style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '15px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        marginBottom: '10px',
+                        cursor: 'pointer',
+                        backgroundColor: formData.paymentMethod === 'mobile_money_orange' ? '#f8f9ff' : 'white'
+                    }}>
+                        <input 
+                            type="radio" 
+                            name="paymentMethod" 
+                            value="mobile_money_orange" 
+                            checked={formData.paymentMethod === 'mobile_money_orange'} 
+                            onChange={handleChange}
+                            style={{ marginRight: '10px' }}
+                        />
+                        <div>
+                            <span style={{ fontWeight: '500' }}>Orange Money</span>
+                            <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
+                                Pay with your Orange Money account
+                            </div>
+                        </div>
+                    </label>
+
+                    {/* Credit Card */}
+                    <label style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '15px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        marginBottom: '10px',
+                        cursor: 'pointer',
+                        backgroundColor: formData.paymentMethod === 'card' ? '#f8f9ff' : 'white'
+                    }}>
+                        <input 
+                            type="radio" 
+                            name="paymentMethod" 
+                            value="card" 
+                            checked={formData.paymentMethod === 'card'} 
+                            onChange={handleChange}
+                            style={{ marginRight: '10px' }}
+                        />
+                        <div>
+                            <span style={{ fontWeight: '500' }}>Credit/Debit Card</span>
+                            <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
+                                Visa, Mastercard, American Express
+                            </div>
+                        </div>
                     </label>
                 </div>
                 
+                {/* Payment Method Specific Content */}
                 {formData.paymentMethod === 'cod' && (
                     <div style={{
-                    padding: '15px',
-                    backgroundColor: '#f8f9fa',
-                    borderRadius: '4px',
-                    marginBottom: '20px'
+                        padding: '15px',
+                        backgroundColor: '#f8f9fa',
+                        borderRadius: '4px',
+                        marginBottom: '20px'
                     }}>
-                    <p style={{ margin: 0, color: '#666' }}>
-                        You'll pay when you receive your order
-                    </p>
+                        <p style={{ margin: 0, color: '#666' }}>
+                            You'll pay when you receive your order
+                        </p>
                     </div>
                 )}
-                </section>
 
-                {/* Card Details */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '15px',
-                  marginBottom: '15px'
-                }}>
+                {/* Mobile Money Phone Number Input */}
+                {(formData.paymentMethod === 'mobile_money_mtn' || formData.paymentMethod === 'mobile_money_orange') && (
+                    <div style={{ 
+                        padding: '15px',
+                        backgroundColor: '#f8f9fa',
+                        borderRadius: '4px',
+                        marginBottom: '20px'
+                    }}>
+                        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
+                            Mobile Money Phone Number
+                        </label>
+                        <input
+                            type="tel"
+                            name="mobileMoneyPhone"
+                            value={formData.mobileMoneyPhone || ''}
+                            onChange={handleChange}
+                            placeholder="e.g., 237670000000"
+                            required
+                            style={{
+                                width: '100%',
+                                padding: '12px',
+                                border: '1px solid #ddd',
+                                borderRadius: '4px',
+                                fontSize: '14px',
+                                outline: 'none',
+                                transition: 'border-color 0.2s'
+                            }}
+                        />
+                        <small style={{ color: '#666', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+                            Please enter your phone number with country code (e.g., 237 for Cameroon)
+                        </small>
+                    </div>
+                )}
+
+                {/* Payment Method Specific Content */}
+                {formData.paymentMethod === 'cod' && (
+                    <div style={{ 
+                        padding: '15px',
+                        backgroundColor: '#f8f9fa',
+                        borderRadius: '4px',
+                        marginBottom: '20px'
+                    }}>
+                        <p style={{ margin: 0, color: '#666' }}>
+                            You'll pay when you receive your order
+                        </p>
+                    </div>
+                )}
+
+                {/* Mobile Money Phone Number Input */}
+                {(formData.paymentMethod === 'mobile_money_mtn' || formData.paymentMethod === 'mobile_money_orange') && (
+                    <div style={{ 
+                        padding: '15px',
+                        backgroundColor: '#f8f9fa',
+                        borderRadius: '4px',
+                        marginBottom: '20px'
+                    }}>
+                        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
+                            Mobile Money Phone Number
+                        </label>
+                        <input
+                            type="tel"
+                            name="phoneNumber"
+                            value={formData.phoneNumber || ''}
+                            onChange={handleChange}
+                            placeholder="e.g., 237670000000"
+                            required
+                            style={{
+                                width: '100%',
+                                padding: '12px',
+                                border: '1px solid #ddd',
+                                borderRadius: '4px',
+                                fontSize: '14px',
+                                outline: 'none',
+                                transition: 'border-color 0.2s'
+                            }}
+                        />
+                        <small style={{ color: '#666', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+                            Please enter your phone number with country code (e.g., 237 for Cameroon)
+                        </small>
+                    </div>
+                )}
+
+              {/* Card Details Section */}
+              {formData.paymentMethod === 'card' && (
+                <>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '15px',
+                    marginBottom: '15px'
+                  }}>
                   <div>
                     <input 
                       type="text" 
@@ -606,6 +814,8 @@ const CheckoutPage = () => {
                   
                   login to save card information for next orders
                 </label>
+                </>
+              )}
               </section>
 
               {/* Terms and Conditions */}

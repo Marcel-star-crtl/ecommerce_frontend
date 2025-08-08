@@ -7,12 +7,29 @@ import {
 } from "mdb-react-ui-kit";
 
 import ButtonWishList from "../btn/btnwishlist";
-import Button from "../btn/btn";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart, fetchCart } from "../../cart/cartSlice";
 
 import styles from "./style.module.css";
 
 function ProductCard({ product }) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { addStatus } = useSelector((state) => state.cart);
+  const { isLoggedIn } = useSelector((state) => state.auth);
+
+  const handleAddToCart = async () => {
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
+    const result = await dispatch(addToCart({ product, quantity: 1 }));
+    if (addToCart.fulfilled.match(result)) {
+      dispatch(fetchCart());
+    }
+  };
+
   return (
     <div className="p-0" style={{ paddingRight: '10px', paddingLeft: '10px', marginBottom: '20px' }}>
       <div className={`${styles.product}`}>
@@ -135,14 +152,15 @@ function ProductCard({ product }) {
                 onMouseLeave={(e) => {
                   e.target.style.backgroundColor = '#E8A5C4';
                 }}
+                onClick={handleAddToCart}
+                disabled={addStatus === 'loading' || product.quantity === 0}
               >
-                Add to Cart - ${product.price}
+                {addStatus === 'loading'
+                  ? "Adding..."
+                  : product.quantity === 0
+                  ? "Out of Stock"
+                  : `Add to Cart - $${product.price}`}
               </button>
-            </div>
-
-            {/* Hidden original Button component for functionality */}
-            <div className="d-none">
-              <Button el={product} />
             </div>
           </div>
         </MDBCard>

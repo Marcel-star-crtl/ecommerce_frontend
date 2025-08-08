@@ -1,4 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
+import loaderMiddleware from './loaderMiddleware';
 import apiStatusSlice from "../features/utils/apiStatusSlice";
 import authSlice from "../features/auth/authSlice";
 import categorySlice from "../features/Category/CategoryPage/categorySlice";
@@ -10,10 +11,12 @@ import ordersSlice from "../features/order/ordersSlice";
 import productHomePageSlice from "../features/home/productHomePageSlice";
 import shopsReducer from "../features/shops/shopsSlice";
 import bestSellersReducer from '../features/ProductDetails/bestSellersSlice';
-import videoReducer from '../slices/videoSlice';
+import videoReducer from '../features/videos/videoSlice';
 import brandSlice from '../features/admin/brandSlice';
 import colorSlice from '../features/admin/colorSlice';
-import couponSlice from '../features/admin/couponSlice'; 
+import couponSlice from '../features/admin/couponSlice';
+import loaderReducer from '../features/utils/loadersSlice'; 
+import faqReducer from '../features/faqs/faqSlice';
 
 const store = configureStore({
   reducer: {
@@ -28,11 +31,14 @@ const store = configureStore({
     productHomePage: productHomePageSlice,
     shops: shopsReducer,
     bestSellers: bestSellersReducer,
-    video: videoReducer,
+    videos: videoReducer,
     brands: brandSlice,
     colors: colorSlice,
     coupons: couponSlice,
+    loader: loaderReducer,
+    faqs: faqReducer,
   },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(loaderMiddleware),
 });
 
 export default store;

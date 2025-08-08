@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'https://ecommerce-api-1-c0uz.onrender.com/api';
+const API_URL = 'http://127.0.0.1:5001/api';
+// const API_URL = 'https://ecommerce-api-1-c0uz.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -139,6 +140,52 @@ export const cartAPI = {
   getOrders: () => api.get('/user/get-orders'),
   getAllOrders: () => api.get('/user/getallorders'),
   updateOrderStatus: (orderId, status) => api.put('/user/update-order-status', { orderId, status }),
+};
+
+// FAQ API
+export const faqAPI = {
+  getFAQs: () => api.get('/faq'),
+  getFAQ: (id) => api.get(`/faq/${id}`),
+  createFAQ: (data) => api.post('/faq', data),
+  updateFAQ: (id, data) => api.put(`/faq/${id}`, data),
+  deleteFAQ: (id) => api.delete(`/faq/${id}`),
+};
+
+// Video API
+export const videoAPI = {
+  getVideos: () => api.get('/videos'),
+  createVideo: (data) => api.post('/videos', data),
+};
+
+// Enquiry API
+export const enquiryAPI = {
+  createEnquiry: (data) => api.post('/enquiry', data),
+  getEnquiries: () => api.get('/enquiry'),
+  getEnquiry: (id) => api.get(`/enquiry/${id}`),
+  updateEnquiry: (id, data) => api.put(`/enquiry/${id}`, data),
+  deleteEnquiry: (id) => api.delete(`/enquiry/${id}`),
+};
+
+// Mobile Money API
+export const mobileMoneyAPI = {
+  initiate: (data) => api.post('/mobile-money/initiate', data),
+  verify: (reference) => api.get(`/mobile-money/verify/${reference}`),
+};
+
+// Order Management API
+export const orderAPI = {
+  createOrder: (data) => api.post('/orders/create-order', data),
+  captureOrder: (data) => api.post('/orders/capture-order', data),
+  getOrders: () => api.get('/orders/get-orders'),
+  getSingleOrder: (id) => api.get(`/orders/get-orders/${id}`),
+  getUserOrders: () => api.get('/orders/user-orders'),
+  getOrderById: (id) => api.get(`/orders/${id}`),
+  updateOrderStatus: (orderId, status) => api.put(`/orders/${orderId}/status`, { status }),
+  confirmDelivery: (orderId) => api.post('/orders/confirm-delivery', { orderId }),
+  confirmReceipt: (data) => api.post('/orders/confirm-receipt', data),
+  initiateConfirmation: (orderId) => api.post('/orders/initiate-confirmation', { orderId }),
+  getTotalIncome: () => api.get('/orders/gettotalincome'),
+  getMonthlyIncome: () => api.get('/orders/monthly-income'),
 };
 
 export default api;

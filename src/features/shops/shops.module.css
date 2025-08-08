@@ -1,22 +1,250 @@
-.shop-container {
+/* Shops Page Responsive Styles */
+.shopWrapper {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
 
-  margin: 4rem 6rem !important;
-  background-color: #f8f9fa; 
+.shopContainer {
+  background-color: #f8f9fa !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+  padding: 0 !important; /* Will be set via inline styles for responsive values */
+  width: 100% !important;
 }
-  
-.shop-container h1 {
-  margin-bottom: 70px;
-  color: #343a40; 
+
+.headerSection {
+  text-align: center;
+  margin-bottom: 2rem;
 }
-  
+
+.shopContainer h1 {
+  margin-bottom: 2rem;
+  color: #343a40;
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* Empty and Error States */
+.emptyState,
+.errorState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  padding: 2rem;
+}
+
+.emptyContent,
+.errorContent {
+  text-align: center;
+  max-width: 400px;
+}
+
+/* Pagination Wrapper */
+.paginationWrapper {
+  margin-top: 3rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+/* Product Grid Responsive Spacing */
+.mb-3 {
+  margin-bottom: 1rem !important;
+}
+
 .mb-4 {
   margin-bottom: 1.5rem !important;
 }
 
-.product-card {
-  transition: transform 0.3s ease;
+/* Product Card Hover Effects */
+.productCard {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.product-card:hover {
-  transform: scale(1.05); 
+.productCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+/* Additional Sections Spacing */
+.additionalSections {
+  margin-top: 4rem;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 480px) {
+  .shopWrapper {
+    padding: 0;
+  }
+
+  .shopContainer {
+    padding: 1rem 0.25rem !important;
+  }
+
+  .headerSection {
+    margin-bottom: 1rem;
+  }
+
+  .shopContainer h1 {
+    font-size: 24px !important;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+  }
+
+  .paginationWrapper {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .emptyState,
+  .errorState {
+    min-height: 200px;
+    padding: 0.5rem;
+  }
+
+  .additionalSections {
+    margin-top: 1.5rem;
+  }
+
+  /* Mobile pagination styles */
+  .paginationWrapper .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem;
+  }
+
+  .paginationWrapper .page-link {
+    font-size: 12px !important;
+    padding: 0.375rem 0.5rem;
+    min-width: 32px;
+  }
+
+  /* Better mobile grid spacing */
+  .mb-3 {
+    margin-bottom: 0.75rem !important;
+  }
+}
+
+/* Tablet Responsive Styles */
+@media (min-width: 481px) and (max-width: 768px) {
+  .shopContainer {
+    padding: 1.5rem 0.5rem !important;
+  }
+
+  .shopContainer h1 {
+    font-size: 28px !important;
+    margin-bottom: 1.5rem;
+  }
+
+  .paginationWrapper {
+    margin-top: 2rem;
+  }
+
+  .emptyState,
+  .errorState {
+    min-height: 200px;
+  }
+
+  .additionalSections {
+    margin-top: 2rem;
+  }
+}
+
+/* Desktop Small Responsive Styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .shopContainer {
+    padding: 2rem 0.75rem !important;
+  }
+
+  .shopContainer h1 {
+    font-size: 30px !important;
+    margin-bottom: 2rem;
+  }
+
+  .paginationWrapper {
+    margin-top: 2.5rem;
+  }
+}
+
+/* Desktop Large Styles */
+@media (min-width: 1025px) {
+  .shopContainer {
+    padding: 2.5rem 1rem !important;
+  }
+
+  .shopContainer h1 {
+    font-size: 32px !important;
+    margin-bottom: 2rem;
+  }
+
+  .paginationWrapper {
+    margin-top: 2.5rem;
+  }
+
+  /* Custom 5-column layout for desktop */
+  .fiveColumnGrid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .fiveColumnItem {
+    width: 100%;
+  }
+}
+
+/* Custom grid for better space usage on large screens */
+@media (min-width: 1200px) {
+  .shopContainer {
+    padding: 2.5rem 0.75rem !important;
+  }
+
+  .fiveColumnGrid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+/* Ultra-wide screens */
+@media (min-width: 1400px) {
+  .shopContainer {
+    padding: 2.5rem 1rem !important;
+    max-width: 1400px;
+    margin: 0 auto !important;
+  }
+}
+
+/* Loading Animation */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.loadingState {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Accessibility Improvements */
+.paginationWrapper .page-link:focus {
+  box-shadow: 0 0 0 2px rgba(232, 165, 196, 0.5);
+  outline: none;
+}
+
+.productCard:focus-within {
+  outline: 2px solid rgba(232, 165, 196, 0.5);
+  outline-offset: 2px;
 }

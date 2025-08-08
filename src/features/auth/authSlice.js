@@ -16,23 +16,26 @@ const initialState = {
   token: localStorage.getItem("token"),
   refreshToken: localStorage.getItem("refreshToken"),
   user: parseUserFromStorage(),
+  loading: false,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
     login: (state, action) => {
       if (!action.payload?.token || !action.payload?.user) {
         console.error("Invalid login payload structure", action.payload);
         return;
       }
-      
       state.isLoggedIn = true;
       state.token = action.payload.token;
       state.refreshToken = action.payload.refreshToken;
       state.user = action.payload.user;
-
+      state.loading = false;
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("token", action.payload.token);
       if (action.payload.refreshToken) {
@@ -45,7 +48,7 @@ const authSlice = createSlice({
       state.token = null;
       state.refreshToken = null;
       state.user = null;
-
+      state.loading = false;
       localStorage.removeItem("isLoggedIn");
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
@@ -54,7 +57,6 @@ const authSlice = createSlice({
     fixAuthState: (state) => {
       const token = localStorage.getItem("token");
       const user = parseUserFromStorage();
-      
       if (token && user) {
         state.isLoggedIn = true;
         state.token = token;
@@ -66,9 +68,10 @@ const authSlice = createSlice({
         state.refreshToken = null;
         state.user = null;
       }
+      state.loading = false;
     }
   },
 });
 
-export const { login, logout, fixAuthState } = authSlice.actions;
+export const { setLoading, login, logout, fixAuthState } = authSlice.actions;
 export default authSlice.reducer;

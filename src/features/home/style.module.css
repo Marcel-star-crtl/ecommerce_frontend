@@ -1,3 +1,82 @@
+/* Carousel Dots Styles - Ensure perfect circles */
+.carouselDots {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+.carouselDot {
+  width: 12px;
+  height: 12px;
+  min-width: 12px;
+  min-height: 12px;
+  border-radius: 50%;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+  margin: 0;
+  flex-shrink: 0;
+  display: block;
+  box-sizing: border-box;
+}
+
+.carouselDot.active {
+  background-color: white;
+  transform: scale(1.2);
+}
+
+.carouselDot:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+  transform: scale(1.1);
+}
+
+/* Mobile responsive carousel dots */
+@media (max-width: 767px) {
+  .carouselDots {
+    bottom: 15px;
+    gap: 8px;
+  }
+
+  .carouselDot {
+    width: 10px;
+    height: 10px;
+    min-width: 10px;
+    min-height: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carouselDots {
+    bottom: 12px;
+    gap: 6px;
+  }
+
+  .carouselDot {
+    width: 8px;
+    height: 8px;
+    min-width: 8px;
+    min-height: 8px;
+  }
+}
+
+/* Prevent any global button styles from affecting dots */
+button.carouselDot {
+  background: rgba(255, 255, 255, 0.5) !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+button.carouselDot.active {
+  background: white !important;
+}
+
 /* .body {
   background-color: #f5f5f5;
   position: relative;

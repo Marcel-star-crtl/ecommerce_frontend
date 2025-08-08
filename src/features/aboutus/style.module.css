@@ -17,4 +17,110 @@
   object-fit: cover;
 }
 
+/* Mobile First Responsive Design */
+@media (max-width: 767px) {
+  .body {
+    padding: 20px 10px;
+  }
 
+  .teamImages {
+    gap: 15px;
+    justify-content: center;
+  }
+
+  .teamImage {
+    width: calc(50% - 10px);
+    max-width: 150px;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .body {
+    padding: 15px 8px;
+  }
+
+  .teamImages {
+    gap: 10px;
+  }
+
+  .teamImage {
+    width: calc(100% - 10px);
+    max-width: 200px;
+  }
+}
+
+/* Tablet styles */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .body {
+    padding: 30px 15px;
+  }
+
+  .teamImages {
+    gap: 18px;
+  }
+
+  .teamImage {
+    width: calc(50% - 15px);
+  }
+}
+
+/* About page content responsive */
+.aboutContent {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.aboutContent h1 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.aboutContent h2 {
+  font-size: 2rem;
+  margin: 2rem 0 1rem;
+  color: #555;
+}
+
+.aboutContent p {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  color: #666;
+}
+
+@media (max-width: 767px) {
+  .aboutContent h1 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .aboutContent h2 {
+    font-size: 1.5rem;
+    margin: 1.5rem 0 1rem;
+  }
+
+  .aboutContent p {
+    font-size: 1rem;
+    margin-bottom: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .aboutContent h1 {
+    font-size: 1.7rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .aboutContent h2 {
+    font-size: 1.3rem;
+    margin: 1.2rem 0 0.8rem;
+  }
+
+  .aboutContent p {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+}

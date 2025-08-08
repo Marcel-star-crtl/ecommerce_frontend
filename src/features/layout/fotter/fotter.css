@@ -47,4 +47,157 @@
   .footer .form-control::placeholder {
     color: #aaa;
   }
+
+  /* Mobile First Responsive Design */
+  @media (max-width: 767px) {
+    .footer {
+      padding: 40px 0 20px;
+    }
+
+    .footer .container-fluid {
+      padding: 0 15px;
+    }
+
+    .footer .row {
+      text-align: center;
+    }
+
+    .footer .col-md-6,
+    .footer .col-lg-3,
+    .footer .col-lg-4 {
+      margin-bottom: 30px;
+    }
+
+    .footer h5 {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+    }
+
+    .footer p,
+    .footer a {
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .footer .btn-square {
+      width: 44px;
+      height: 44px;
+      margin: 0 4px;
+    }
+
+    .footer-bottom img {
+      max-width: 120px;
+      margin-bottom: 15px;
+    }
+
+    .footer .form-control {
+      font-size: 16px; /* Prevents zoom on iOS */
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .footer .btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+    }
+
+    /* Stack footer columns vertically on mobile */
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-social {
+      margin-top: 20px;
+    }
+  }
+
+  /* Small mobile devices */
+  @media (max-width: 480px) {
+    .footer {
+      padding: 30px 0 15px;
+    }
+
+    .footer .container-fluid {
+      padding: 0 10px;
+    }
+
+    .footer h5 {
+      font-size: 1rem;
+    }
+
+    .footer p,
+    .footer a {
+      font-size: 0.85rem;
+    }
+
+    .footer .btn-square {
+      width: 40px;
+      height: 40px;
+      margin: 0 2px;
+    }
+
+    .footer-bottom img {
+      max-width: 100px;
+    }
+  }
+
+  /* Tablet styles */
+  @media (max-width: 1023px) and (min-width: 768px) {
+    .footer {
+      padding: 50px 0 30px;
+    }
+
+    .footer .container-fluid {
+      padding: 0 20px;
+    }
+
+    .footer .col-lg-3,
+    .footer .col-lg-4 {
+      margin-bottom: 30px;
+    }
+
+    .footer h5 {
+      font-size: 1.2rem;
+    }
+  }
+
+  /* Newsletter subscription mobile optimization */
+  @media (max-width: 767px) {
+    .newsletter-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    .newsletter-form .form-control {
+      border-radius: 6px;
+    }
+
+    .newsletter-form .btn {
+      border-radius: 6px;
+    }
+  }
+
+  /* Footer bottom responsive */
+  @media (max-width: 767px) {
+    .footer-bottom {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .footer-bottom .row {
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .footer-bottom p {
+      font-size: 0.8rem;
+      margin: 0;
+    }
+  }
   

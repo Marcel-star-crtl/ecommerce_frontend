@@ -88,8 +88,8 @@ function Home() {
         contentPadding: '0 20px',
         fontSize: '14px',
         buttonPadding: '10px 30px',
-        dotSize: '10px',
-        dotBottom: '15px'
+        dotSize: '12px',
+        dotBottom: '20px'
       };
     } else if (windowWidth <= 768) {
       return {
@@ -101,8 +101,8 @@ function Home() {
         contentPadding: '0 30px',
         fontSize: '15px',
         buttonPadding: '11px 35px',
-        dotSize: '11px',
-        dotBottom: '20px'
+        dotSize: '14px',
+        dotBottom: '25px'
       };
     } else if (windowWidth <= 1024) {
       return {
@@ -114,8 +114,8 @@ function Home() {
         contentPadding: '0 40px',
         fontSize: '16px',
         buttonPadding: '12px 40px',
-        dotSize: '12px',
-        dotBottom: '25px'
+        dotSize: '16px',
+        dotBottom: '30px'
       };
     } else {
       return {
@@ -358,28 +358,12 @@ function Home() {
           </div>
 
           {/* Carousel Dots */}
-          <div style={{
-            position: 'absolute',
-            bottom: responsive.dotBottom,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            gap: windowWidth <= 480 ? '6px' : '8px',
-            zIndex: 10
-          }}>
+          <div className={styles.carouselDots}>
             {slides.map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                style={{
-                  width: responsive.dotSize,
-                  height: responsive.dotSize,
-                  borderRadius: '50%',
-                  border: 'none',
-                  backgroundColor: currentSlide === index ? 'white' : 'rgba(255, 255, 255, 0.5)',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
+                className={`${styles.carouselDot} ${currentSlide === index ? styles.active : ''}`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
@@ -453,6 +437,12 @@ function Home() {
                   gap: windowWidth <= 480 ? '15px' : '20px',
                   animation: `scroll-horizontal ${windowWidth <= 480 ? '15s' : windowWidth <= 768 ? '20s' : '30s'} linear infinite`,
                   width: 'max-content'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.animationPlayState = 'paused';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.animationPlayState = 'running';
                 }}
               >
                 {duplicatedTrendingProducts.map((product, index) => (
@@ -535,6 +525,12 @@ function Home() {
                   gap: windowWidth <= 480 ? '15px' : '20px',
                   animation: `scroll-horizontal-reverse ${windowWidth <= 480 ? '20s' : windowWidth <= 768 ? '25s' : '35s'} linear infinite`,
                   width: 'max-content'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.animationPlayState = 'paused';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.animationPlayState = 'running';
                 }}
               >
                 {duplicatedBestSellers.map((product, index) => (
@@ -621,7 +617,27 @@ function Home() {
 
         .trending-products-scroll:hover,
         .best-sellers-scroll:hover {
-          animation-play-state: paused;
+          animation-play-state: paused !important;
+        }
+
+        .trending-products-scroll:hover *,
+        .best-sellers-scroll:hover * {
+          pointer-events: auto;
+        }
+
+        /* Ensure smooth hover interactions */
+        .trending-products-scroll,
+        .best-sellers-scroll {
+          will-change: transform;
+          cursor: pointer;
+        }
+
+        /* Mobile touch support for pause on tap */
+        @media (max-width: 768px) {
+          .trending-products-scroll:active,
+          .best-sellers-scroll:active {
+            animation-play-state: paused !important;
+          }
         }
 
         /* Responsive breakpoints for animations */

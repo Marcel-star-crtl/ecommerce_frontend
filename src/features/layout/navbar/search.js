@@ -11,36 +11,52 @@ export const Search = ({ categories }) => {
   };
 
   // &category__name=sport
-  let timeout;
+  const [searchTerm, setSearchTerm] = useState("");
   const [tableVisible, setTableVisible] = useState(false);
   const [resError, setResError] = useState();
-  const [dataSearch, setDataSearch] = useState();
+  const [dataSearch, setDataSearch] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const onKeySearch = ($event) => {
-    clearTimeout(timeout);
-    if ($event.target.value.trim() !== "") {
-      timeout = setTimeout(() => {
-        if ($event.keyCode !== 13) {
-          api
-            .get(
-              `/products?search=${$event.target.value.trim()}&${
-                selectedValue && `&category__name=${selectedValue}`
-              }`
-            )
-            .then((res) => {
-              setResError("");
-              setTableVisible(true);
-              setDataSearch(res.data.results);
-            })
-            .catch((err) => {
-              console.log(err.originalError.response.data);
-              setResError("Not Found");
-            });
-        }
-      }, 1000);
-    } else {
+  // Live search with debounce
+  useEffect(() => {
+    if (!searchTerm.trim()) {
       setTableVisible(false);
+      setDataSearch([]);
+      setResError("");
+      return;
     }
+    setLoading(true);
+    const handler = setTimeout(() => {
+      api.get(`/search?q=${searchTerm.trim()}`)
+        .then((res) => {
+          setResError("");
+          setTableVisible(true);
+          setDataSearch(res.data);
+        })
+        .catch(() => {
+          setResError("Not Found");
+          setDataSearch([]);
+        })
+        .finally(() => setLoading(false));
+    }, 400); // 400ms debounce
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  const onInputChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // Helper to get image URL (from ProductDetails.js logic)
+  const CLOUDINARY_CLOUD_NAME = 'ddlhwv65t';
+  const getCloudinaryUrl = (imageUrl) => {
+    if (!imageUrl) return '';
+    const urlParts = imageUrl.split('/');
+    const imageId = urlParts[urlParts.length - 1];
+    return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/${imageId}`;
+  };
+  const getImageUrl = (imageData) => {
+    if (!imageData) return 'https://via.placeholder.com/60x60/f5f3f0/999999?text=Product';
+    return imageData.url || getCloudinaryUrl(imageData.image) || 'https://via.placeholder.com/60x60/f5f3f0/999999?text=Product';
   };
 
   return (
@@ -64,53 +80,54 @@ export const Search = ({ categories }) => {
         </select>
 
         <input
-          className={`form-control w-100 rounded-0 border-start-0  `}
+          className={`form-control w-100 rounded-0 border-start-0`}
           type="search"
-          placeholder="Search"
+          placeholder="Search products..."
           aria-label="Search"
-          onKeyUp={onKeySearch}
+          value={searchTerm}
+          onChange={onInputChange}
           onBlur={() => setTimeout(() => setTableVisible(false), 100)}
-          onFocus={() => setTableVisible(true)}
+          onFocus={() => searchTerm && setTableVisible(true)}
         />
       </form>
       {tableVisible && (
         <div className={styles.divTable}>
           <table className={styles.table}>
-            <div>
-              {dataSearch &&
-                dataSearch.map((el) => (
-                  <Link
-                    to={`/product/${el.id}`}
-                    className={styles.a}
-                    key={el.id}
-                  >
-                    <div className="d-flex align-items-center gap-3 p-0">
-                      <img
-                        className={styles.img}
-                        src={`https://res.cloudinary.com/ddk98mjzn/${
-                          el.images.length && el.images[0].image
-                        }`}
-                        alt="productImage"
-                      />
-
-                      <span>{el.name}</span>
-                    </div>
-                  </Link>
-                ))}
-            </div>
-            {resError && (
+            <tbody>
+              {loading && (
+                <tr><td>Loading...</td></tr>
+              )}
+              {!loading && dataSearch.length > 0 && dataSearch.map((el) => (
+                <tr key={el._id}>
+                  <td>
+                    <Link to={`/product/${el._id}`} className={styles.a}>
+                      <div className="d-flex align-items-center gap-3 p-0">
+                        <img
+                          className={styles.img}
+                          src={el.images && el.images.length ? getImageUrl(el.images[0]) : 'https://via.placeholder.com/60x60/f5f3f0/999999?text=Product'}
+                          alt={el.title || el.name || 'Product'}
+                          style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 8, background: '#f5f3f0' }}
+                        />
+                        <span>{el.name || el.title}</span>
+                      </div>
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+              {!loading && resError && (
+                <tr>
+                  <td>
+                    <div className="text-center font-weight-bold">{resError}</div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+            <tfoot className={styles.tfoot}>
               <tr>
-                <td>
-                  {" "}
-                  <div className="text-center font-weight-bold">{resError}</div>
+                <td className="text-center" colSpan="2">
+                  See More
                 </td>
               </tr>
-            )}
-
-            <tfoot className={styles.tfoot}>
-              <td className="text-center" colSpan="2">
-                See More
-              </td>
             </tfoot>
           </table>
         </div>

@@ -46,14 +46,13 @@ function Navbar() {
     const timeout = setTimeout(() => {
       const categoryParam = selectedCategory ? `&category__name=${selectedCategory}` : "";
       
-      api.get(`/products?search=${query}${categoryParam}`)
+      api.get(`/search?q=${query}`)
         .then((res) => {
           setSearchError("");
           setShowResults(true);
-          setSearchResults(res.data.results || []);
+          setSearchResults(res.data || []);
         })
         .catch((err) => {
-          console.log(err);
           setSearchError("No products found");
           setShowResults(true);
           setSearchResults([]);
@@ -86,7 +85,11 @@ function Navbar() {
         top: 0,
         zIndex: 1000
       }}>
-        <div className="container-fluid" style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 16px' }}>
+        <div className="container-fluid" style={{ 
+          maxWidth: '1400px', 
+          margin: '0 auto', 
+          padding: window.innerWidth <= 768 ? '0 12px' : '0 16px' 
+        }}>
           <div className="d-flex justify-content-between align-items-center w-100">
             
             {/* Left side - Brand */}
@@ -175,7 +178,10 @@ function Navbar() {
             </div>
 
             {/* Right side - Icons and Account */}
-            <div className="d-flex align-items-center gap-2 gap-md-3" style={{ flex: '0 0 auto' }}>
+            <div className="d-flex align-items-center" style={{ 
+              flex: '0 0 auto',
+              gap: window.innerWidth <= 768 ? '12px' : '16px'
+            }}>
               
               {/* Search Icon */}
               <button
@@ -185,11 +191,23 @@ function Navbar() {
                   border: 'none',
                   background: 'transparent',
                   color: '#333',
-                  fontSize: '20px'
+                  minWidth: window.innerWidth <= 768 ? '40px' : '44px',
+                  minHeight: window.innerWidth <= 768 ? '40px' : '44px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '6px'
                 }}
                 aria-label="Search"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg 
+                  width={window.innerWidth <= 768 ? "18" : "20"} 
+                  height={window.innerWidth <= 768 ? "18" : "20"} 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2"
+                >
                   <circle cx="11" cy="11" r="8"></circle>
                   <path d="M21 21l-4.35-4.35"></path>
                 </svg>
@@ -199,19 +217,34 @@ function Navbar() {
               <Link
                 to="/wishlist"
                 className="text-decoration-none position-relative"
-                style={{ color: '#333' }}
+                style={{ 
+                  color: '#333',
+                  minWidth: window.innerWidth <= 768 ? '40px' : '44px',
+                  minHeight: window.innerWidth <= 768 ? '40px' : '44px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '6px'
+                }}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg 
+                  width={window.innerWidth <= 768 ? "18" : "20"} 
+                  height={window.innerWidth <= 768 ? "18" : "20"} 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2"
+                >
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                 </svg>
                 <span
                   className="position-absolute badge rounded-pill bg-danger"
                   style={{
-                    top: '-8px',
-                    right: '-8px',
-                    fontSize: '10px',
-                    minWidth: '16px',
-                    height: '16px',
+                    top: window.innerWidth <= 768 ? '-6px' : '-8px',
+                    right: window.innerWidth <= 768 ? '-6px' : '-8px',
+                    fontSize: window.innerWidth <= 768 ? '9px' : '10px',
+                    minWidth: window.innerWidth <= 768 ? '14px' : '16px',
+                    height: window.innerWidth <= 768 ? '14px' : '16px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
@@ -225,9 +258,24 @@ function Navbar() {
               <Link
                 to="/cart"
                 className="text-decoration-none position-relative"
-                style={{ color: '#333' }}
+                style={{ 
+                  color: '#333',
+                  minWidth: window.innerWidth <= 768 ? '40px' : '44px',
+                  minHeight: window.innerWidth <= 768 ? '40px' : '44px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '6px'
+                }}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg 
+                  width={window.innerWidth <= 768 ? "18" : "20"} 
+                  height={window.innerWidth <= 768 ? "18" : "20"} 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2"
+                >
                   <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z"></path>
                   <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z"></path>
                   <path d="M1 1H5L7.68 14.39C7.77144 14.8504 7.99191 15.2736 8.31378 15.5981C8.63564 15.9225 9.04213 16.1314 9.48 16.19H19.4C19.7056 16.1934 20.0112 16.1342 20.2972 16.0156C20.5832 15.897 20.8421 15.7218 21.0564 15.5009C21.2706 15.28 21.4354 15.0186 21.5402 14.731C21.6449 14.4434 21.6872 14.1361 21.664 13.83L20.36 6H6"></path>
@@ -236,11 +284,11 @@ function Navbar() {
                   <span
                     className="position-absolute badge rounded-pill bg-danger"
                     style={{
-                      top: '-8px',
-                      right: '-8px',
-                      fontSize: '10px',
-                      minWidth: '16px',
-                      height: '16px',
+                      top: window.innerWidth <= 768 ? '-6px' : '-8px',
+                      right: window.innerWidth <= 768 ? '-6px' : '-8px',
+                      fontSize: window.innerWidth <= 768 ? '9px' : '10px',
+                      minWidth: window.innerWidth <= 768 ? '14px' : '16px',
+                      height: window.innerWidth <= 768 ? '14px' : '16px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'
@@ -252,7 +300,10 @@ function Navbar() {
               </Link>
 
               {/* Desktop Account Links */}
-              <div className="d-none d-md-flex align-items-center gap-2 gap-lg-3">
+              <div className="d-none d-md-flex align-items-center" style={{ 
+                gap: window.innerWidth <= 1024 ? '8px' : '12px',
+                marginLeft: '8px'
+              }}>
                 <Link
                   to="/stores"
                   className="text-decoration-none d-none d-lg-inline"
@@ -325,12 +376,20 @@ function Navbar() {
                 <Link
                   to="/orders"
                   className="text-decoration-none"
-                  style={{ color: '#333' }}
+                  style={{ 
+                    color: '#333',
+                    minWidth: window.innerWidth <= 768 ? '40px' : '44px',
+                    minHeight: window.innerWidth <= 768 ? '40px' : '44px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '6px'
+                  }}
                   title="My Orders"
                 >
                   <svg
-                    width="20"
-                    height="20"
+                    width={window.innerWidth <= 768 ? "18" : "20"}
+                    height={window.innerWidth <= 768 ? "18" : "20"}
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -356,7 +415,14 @@ function Navbar() {
                 style={{
                   border: 'none',
                   background: 'transparent',
-                  color: '#333'
+                  color: '#333',
+                  minWidth: '40px',
+                  minHeight: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '6px',
+                  marginLeft: '4px'
                 }}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -379,7 +445,11 @@ function Navbar() {
               padding: '16px 0'
             }}
           >
-            <div className="container-fluid" style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 16px' }}>
+            <div className="container-fluid" style={{ 
+              maxWidth: '1400px', 
+              margin: '0 auto', 
+              padding: window.innerWidth <= 768 ? '0 12px' : '0 16px' 
+            }}>
               <div className="position-relative">
                 <div className="d-flex gap-0" style={{ maxWidth: '600px', margin: '0 auto' }}>
                   <select

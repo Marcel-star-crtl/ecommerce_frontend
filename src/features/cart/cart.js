@@ -30,6 +30,7 @@ function Cart() {
   const [height, setHeight] = useState(0);
   const [isUpdating, setIsUpdating] = useState(false);
   const [couponCode, setCouponCode] = useState('');
+  const [cartToast, setCartToast] = useState(null);
 
   const CLOUDINARY_CLOUD_NAME = 'ddlhwv65t';
 
@@ -93,12 +94,18 @@ function Cart() {
       if (newQuantity > currentQuantity) {
         console.log('Incrementing quantity for item:', id);
         await dispatch(incrementCartProduct(id)).unwrap();
+        setCartToast('Item added to cart!');
       } else if (newQuantity < currentQuantity) {
         console.log('Decrementing quantity for item:', id);
         await dispatch(decrementCartProduct(id)).unwrap();
+        setCartToast('Item quantity updated!');
       }
-      
+      if (newQuantity !== currentQuantity) {
+        setTimeout(() => setCartToast(null), 2000);
+      }
     } catch (error) {
+      setCartToast('Error updating cart!');
+      setTimeout(() => setCartToast(null), 2000);
       console.error('Error updating quantity:', error);
     }
   };
@@ -109,8 +116,11 @@ function Cart() {
     try {
       console.log('Deleting item:', id);
       await dispatch(deleteCartProduct(id)).unwrap();
-       
+      setCartToast('Item removed from cart!');
+      setTimeout(() => setCartToast(null), 2000);
     } catch (error) {
+      setCartToast('Error removing item!');
+      setTimeout(() => setCartToast(null), 2000);
       console.error('Error deleting item:', error);
     }
   };
@@ -149,7 +159,11 @@ function Cart() {
     if (window.confirm('Are you sure you want to empty your cart?')) {
       try {
         await dispatch(emptyCart()).unwrap();
+        setCartToast('Cart emptied!');
+        setTimeout(() => setCartToast(null), 2000);
       } catch (error) {
+        setCartToast('Error emptying cart!');
+        setTimeout(() => setCartToast(null), 2000);
         console.error('Error emptying cart:', error);
       }
     }
@@ -272,6 +286,24 @@ function Cart() {
         transition: 'opacity 0.2s'
       }}
     >
+      {cartToast && (
+        <div style={{
+          position: 'fixed',
+          top: 20,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: '#E8A5C4',
+          color: 'white',
+          padding: '12px 32px',
+          borderRadius: '8px',
+          fontSize: '16px',
+          fontWeight: 500,
+          zIndex: 9999,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+        }}>
+          {cartToast}
+        </div>
+      )}
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',

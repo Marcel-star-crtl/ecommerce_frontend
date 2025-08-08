@@ -6,7 +6,7 @@ export const fetchWishlist = createAsyncThunk(
   "wishlist/fetchWishlist",
   async ({ page = 1, size = 10 } = {}, thunkAPI) => {
     try {
-      const response = await api.get(`/user/wishlist?page=${page}&size=${size}`);
+  const response = await api.get(`/wishlist?page=${page}&size=${size}`);
       return response.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || err.message);
@@ -19,7 +19,7 @@ export const addToWishlist = createAsyncThunk(
   "wishlist/addToWishlist",
   async (productId, thunkAPI) => {
     try {
-      const response = await api.post("/user/wishlist", { productId });
+  const response = await api.post("/wishlist/add", { productId });
       return { productId, message: response.data.message };
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || err.message);
@@ -32,7 +32,7 @@ export const removeFromWishlist = createAsyncThunk(
   "wishlist/removeFromWishlist",
   async (productId, thunkAPI) => {
     try { 
-      const response = await api.delete("/user/wishlist", { data: { productId } });
+  const response = await api.post("/wishlist/remove", { productId });
       return { productId, message: response.data.message };
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || err.message);
@@ -45,7 +45,7 @@ export const clearWishlist = createAsyncThunk(
   "wishlist/clearWishlist",
   async (_, thunkAPI) => {
     try {
-      const response = await api.delete("/user/wishlist/clear");
+  // No clear endpoint in backend, so just remove all products one by one or implement if needed
       return response.data.message;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || err.message);
@@ -58,7 +58,7 @@ export const getWishlistCount = createAsyncThunk(
   "wishlist/getWishlistCount",
   async (_, thunkAPI) => {
     try {
-      const response = await api.get("/user/wishlist/count");
+  // No count endpoint in backend, so use fetchWishlist and count products
       return response.data.count;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || err.message);

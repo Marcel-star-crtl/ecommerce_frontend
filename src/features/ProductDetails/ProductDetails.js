@@ -23,6 +23,9 @@ export default function Product() {
   const currentUser = useSelector((state) => state.auth);
   const [img, setImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [showHowToUse, setShowHowToUse] = useState(false);
+  const [showIngredients, setShowIngredients] = useState(false);
+  const [showProductionProcess, setShowProductionProcess] = useState(false);
 
   const CLOUDINARY_CLOUD_NAME = 'ddlhwv65t';
 
@@ -346,31 +349,80 @@ export default function Product() {
                 </div>
               </div>
 
-              {(product.skinType || product.size || product.applicationMethod) && (
-                <div className="mb-4">
-                  {product.skinType && (
-                    <div className="mb-2">
-                      <small style={{ color: '#666666' }}>
-                        <strong>Skin Type:</strong> {product.skinType}
-                      </small>
-                    </div>
-                  )}
-                  {product.size && (
-                    <div className="mb-2">
-                      <small style={{ color: '#666666' }}>
-                        <strong>Size:</strong> {product.size}
-                      </small>
-                    </div>
-                  )}
-                  {product.applicationMethod && (
-                    <div className="mb-2">
-                      <small style={{ color: '#666666' }}>
-                        <strong>Application:</strong> {product.applicationMethod}
-                      </small>
-                    </div>
-                  )}
+              <div className="mb-3">
+                <div 
+                  className="d-flex justify-content-between align-items-center py-2"
+                  style={{ 
+                    borderBottom: '1px solid #e0e0e0',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => setShowHowToUse(!showHowToUse)}
+                >
+                  <span style={{ fontSize: '14px', fontWeight: '500', color: '#333333' }}>
+                    How To Use
+                  </span>
+                  <span style={{ fontSize: '18px', color: '#333333' }}>
+                    {showHowToUse ? '×' : '+'}
+                  </span>
                 </div>
-              )}
+                {showHowToUse && (
+                  <div className="pt-2">
+                    <p style={{ fontSize: '13px', color: '#666666', lineHeight: '1.6', margin: '0' }}>
+                      {product.howToUse || 'This beauty product line was creatively designed to emphasize the flawless beauty of mother nature. We crafted the logo and mixed two natural colors to provide a calm and soothing feeling to everyone who comes across the product.'}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="mb-3">
+                <div 
+                  className="d-flex justify-content-between align-items-center py-2"
+                  style={{ 
+                    borderBottom: '1px solid #e0e0e0',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => setShowIngredients(!showIngredients)}
+                >
+                  <span style={{ fontSize: '14px', fontWeight: '500', color: '#333333' }}>
+                    Ingredients
+                  </span>
+                  <span style={{ fontSize: '18px', color: '#333333' }}>
+                    {showIngredients ? '×' : '+'}
+                  </span>
+                </div>
+                {showIngredients && (
+                  <div className="pt-2">
+                    <p style={{ fontSize: '13px', color: '#666666', lineHeight: '1.6', margin: '0' }}>
+                      {product.ingredients || 'This beauty product line was creatively designed to emphasize the flawless beauty of mother nature. We crafted the logo and mixed two natural colors to provide a calm and soothing feeling to everyone who comes across the product.natural colors to provide a calm and soothing feeling to everyone who comes across the product.'}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="mb-3">
+                <div 
+                  className="d-flex justify-content-between align-items-center py-2"
+                  style={{ 
+                    borderBottom: '1px solid #e0e0e0',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => setShowProductionProcess(!showProductionProcess)}
+                >
+                  <span style={{ fontSize: '14px', fontWeight: '500', color: '#333333' }}>
+                    Production Process
+                  </span>
+                  <span style={{ fontSize: '18px', color: '#333333' }}>
+                    {showProductionProcess ? '×' : '+'}
+                  </span>
+                </div>
+                {showProductionProcess && (
+                  <div className="pt-2">
+                    <p style={{ fontSize: '13px', color: '#666666', lineHeight: '1.6', margin: '0' }}>
+                      {product.productionProcess || 'This beauty product line was creatively designed to emphasize the flawless beauty of mother nature. We crafted the logo and mixed two natural colors to provide a calm and soothing feeling to everyone who comes across the product.'}
+                    </p>
+                  </div>
+                )}
+              </div>
 
             </div>
           </div>
@@ -709,4 +761,3 @@ export default function Product() {
     </div>
   );
 }
-
