@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import CheckoutButton from "./CheckoutButton";
+import './cart.css';
 
 import { deleteCartProduct, fetchCart, incrementCartProduct, decrementCartProduct, applyCoupon, emptyCart } from './cartSlice';
 import Loader from '../../components/Loader/Loader';
@@ -215,68 +216,18 @@ function Cart() {
 
   if (!products?.length) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        backgroundColor: '#f8f9fa',
-        padding: '20px',
-        fontFamily: 'Arial, sans-serif',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div style={{
-          backgroundColor: 'white',
-          padding: '60px 40px',
-          borderRadius: '12px',
-          textAlign: 'center',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-          maxWidth: '500px'
-        }}>
-          <div style={{
-            width: '80px',
-            height: '80px',
-            backgroundColor: '#f0f0f0',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 20px',
-            fontSize: '32px',
-            color: '#ccc'
-          }}>
+      <div className="empty-cart">
+        <div className="empty-cart-content">
+          <div className="empty-cart-icon">
             🛒
           </div>
-          <h3 style={{
-            fontSize: '20px',
-            fontWeight: '500',
-            color: '#333',
-            margin: '0 0 10px 0'
-          }}>
+          <h3 className="empty-cart-title">
             Your shopping cart looks empty
           </h3>
-          <p style={{
-            fontSize: '14px',
-            color: '#666',
-            margin: '0 0 25px 0'
-          }}>
+          <p className="empty-cart-text">
             What are you waiting for?
           </p>
-          <Link
-            to="/home"
-            style={{
-              display: 'inline-block',
-              padding: '12px 24px',
-              backgroundColor: '#E8A5C4',
-              color: 'white',
-              textDecoration: 'none',
-              fontSize: '14px',
-              fontWeight: '500',
-              borderRadius: '4px',
-              transition: 'background-color 0.2s'
-            }}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#E298BC'}
-            onMouseOut={(e) => e.target.style.backgroundColor = '#E8A5C4'}
-          >
+          <Link to="/home" className="start-shopping-btn">
             START SHOPPING
           </Link>
         </div>
@@ -287,101 +238,40 @@ function Cart() {
   return (
     <div
       ref={componentRef}
-      style={{
-        minHeight: '100vh',
-        backgroundColor: '#f8f9fa',
-        padding: '20px',
-        fontFamily: 'Arial, sans-serif',
-        opacity: isUpdating ? 0.8 : 1,
-        transition: 'opacity 0.2s'
-      }}
+      className={`cart-container ${isUpdating ? 'updating' : ''}`}
     >
       {cartToast && (
-        <div style={{
-          position: 'fixed',
-          top: 20,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: '#E8A5C4',
-          color: 'white',
-          padding: '12px 32px',
-          borderRadius: '8px',
-          fontSize: '16px',
-          fontWeight: 500,
-          zIndex: 9999,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
-        }}>
+        <div className="cart-toast">
           {cartToast}
         </div>
       )}
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        backgroundColor: 'white',
-        padding: '30px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '30px',
-          paddingBottom: '20px',
-          borderBottom: '1px solid #e0e0e0'
-        }}>
-          <div>
-            <h1 style={{
-              fontSize: '24px',
-              fontWeight: '400',
-              color: '#333',
-              margin: '0',
-              display: 'inline-block'
-            }}>
+      <div className="cart-content">
+        <div className="cart-header">
+          <div className="cart-title-section">
+            <h1>
               Shopping Cart
             </h1>
-            <span style={{
-              fontSize: '16px',
-              color: '#666',
-              marginLeft: '10px'
-            }}>
+            <span>
               ({itemCount} items)
             </span>
           </div>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '20px'
-          }}>
+          <div className="cart-actions">
             <button 
               onClick={handleEmptyCart}
               disabled={isUpdating || !products?.length}
-              style={{
-                background: 'none',
-                border: 'none',
-                fontSize: '14px',
-                color: isUpdating || !products?.length ? '#ccc' : '#dc3545',
-                cursor: isUpdating || !products?.length ? 'not-allowed' : 'pointer',
-                textDecoration: 'underline'
-              }}
+              className="empty-cart-btn"
             >
               {emptyStatus === 'loading' ? 'Emptying...' : 'Empty Cart'}
             </button>
-            <div style={{
-              fontSize: '14px',
-              color: '#666'
-            }}>
+            <div className="sort-label">
               Sort by: <strong>Recently Added</strong>
             </div>
           </div>
         </div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '2fr 1fr',
-          gap: '40px'
-        }}>
+        <div className="cart-grid">
           {/* Cart Items */}
-          <div>
+          <div className="cart-items-container">
             {products?.map((item, index) => {
               // Use the product ID for delete operations, not the cart item ID
               const itemId = item.product?._id || item.productId || item.id || item._id;
@@ -425,104 +315,46 @@ function Cart() {
               };
               
               return (
-                <div key={itemId} style={{
-                  display: 'flex',
-                  gap: '20px',
-                  paddingBottom: '25px',
-                  marginBottom: '25px',
-                  borderBottom: index < products.length - 1 ? '1px solid #f0f0f0' : 'none',
-                  opacity: isItemUpdating ? 0.6 : 1,
-                  transition: 'opacity 0.2s'
-                }}>
-                  <div style={{
-                    width: '100px',
-                    height: '100px',
-                    backgroundColor: '#f8f9fa',
-                    // borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    overflow: 'hidden', 
-                    padding: '0px' 
-                  }}>
+                <div key={itemId} className={`cart-item ${isItemUpdating ? 'updating' : ''}`}>
+                  <div className="item-image">
                     <Link to={`/product/${itemId}`}>
                       <img
                         src={getItemImageUrl()}
                         alt={item.name || item.title}
-                        style={{
-                          width: '100px',
-                          height: '100px',
-                          objectFit: 'cover', 
-                          display: 'block'
-                        }}
                       />
                     </Link>
                   </div>
 
                   {/* Product Details */}
-                  <div style={{ flex: 1 }}>
+                  <div className="item-details">
                     <Link
                       to={`/product/${itemId}`}
                       style={{ textDecoration: 'none' }}
                     >
-                      <h3 style={{
-                        fontSize: '16px',
-                        fontWeight: '500',
-                        color: '#333',
-                        margin: '0 0 8px 0'
-                      }}>
+                      <h3 className="item-title">
                         {item.name || item.title}
                       </h3>
                     </Link>
-                    <p style={{
-                      fontSize: '13px',
-                      color: '#666',
-                      margin: '0 0 8px 0',
-                      lineHeight: '1.4'
-                    }}>
+                    <p className="item-description">
                       {item.description || 'Celestial Nightly Skin Repair Oil Serum for firming, Hydrating and Restoring + Soap'}
                     </p>
                     {item.itemNumber && (
-                      <p style={{
-                        fontSize: '12px',
-                        color: '#999',
-                        margin: '0 0 4px 0'
-                      }}>
+                      <p className="item-info">
                         ITEM {item.itemNumber}
                       </p>
                     )}
                     {item.size && (
-                      <p style={{
-                        fontSize: '12px',
-                        color: '#666',
-                        margin: '0 0 8px 0'
-                      }}>
+                      <p className="item-size">
                         Size: {item.size}
                       </p>
                     )}
-                    <p style={{
-                      fontSize: '12px',
-                      color: '#666',
-                      margin: '0 0 12px 0'
-                    }}>
+                    <p className="item-info">
                       Sold by Shyneen
                     </p>
                     <button
                       onClick={() => handleDeleteItem(itemId)}
                       disabled={isItemUpdating}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        fontSize: '12px',
-                        color: isItemUpdating ? '#ccc' : '#E8A5C4',
-                        cursor: isItemUpdating ? 'not-allowed' : 'pointer',
-                        textDecoration: 'underline',
-                        padding: '0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '5px'
-                      }}
+                      className="remove-btn"
                     >
                       <i className="fa-solid fa-trash"></i>
                       <span>Remove</span>
@@ -530,70 +362,27 @@ function Cart() {
                   </div>
 
                   {/* Price and Quantity */}
-                  <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-end',
-                    justifyContent: 'space-between',
-                    minWidth: '120px'
-                  }}>
-                    <div style={{
-                      fontSize: '16px',
-                      fontWeight: '500',
-                      color: '#333',
-                      marginBottom: '10px'
-                    }}>
+                  <div className="item-price-section">
+                    <div className="item-price">
                       ${item.price?.toFixed(2)}
                     </div>
 
                     {/* Quantity Controls */}
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px',
-                      marginBottom: '10px'
-                    }}>
+                    <div className="quantity-controls">
                       <button
                         onClick={() => updateQuantity(itemId, itemQuantity - 1)}
                         disabled={isItemUpdating || itemQuantity <= 1}
-                        style={{
-                          width: '24px',
-                          height: '24px',
-                          border: '1px solid #ddd',
-                          backgroundColor: isItemUpdating || itemQuantity <= 1 ? '#f5f5f5' : 'white',
-                          fontSize: '14px',
-                          cursor: isItemUpdating || itemQuantity <= 1 ? 'not-allowed' : 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: isItemUpdating || itemQuantity <= 1 ? '#ccc' : '#333'
-                        }}
+                        className="quantity-btn"
                       >
                         −
                       </button>
-                      <span style={{
-                        fontSize: '14px',
-                        minWidth: '20px',
-                        textAlign: 'center',
-                        fontWeight: '500'
-                      }}>
+                      <span className="quantity-value">
                         {itemQuantity}
                       </span>
                       <button
                         onClick={() => updateQuantity(itemId, itemQuantity + 1)}
                         disabled={isItemUpdating}
-                        style={{
-                          width: '24px',
-                          height: '24px',
-                          border: '1px solid #ddd',
-                          backgroundColor: isItemUpdating ? '#f5f5f5' : 'white',
-                          fontSize: '14px',
-                          cursor: isItemUpdating ? 'not-allowed' : 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: isItemUpdating ? '#ccc' : '#333'
-                        }}
+                        className="quantity-btn"
                       >
                         +
                       </button>
@@ -605,138 +394,69 @@ function Cart() {
           </div>
 
           {/* Order Summary - Sticky */}
-          <div style={{
-            position: 'sticky',
-            top: '50px',
-            height: 'fit-content'
-          }}>
-            <div style={{
-              backgroundColor: '#f8f9fa',
-              padding: '25px',
-              border: '1px solid #e0e0e0'
-            }}>
-              <h3 style={{
-                fontSize: '18px',
-                fontWeight: '500',
-                color: '#333',
-                margin: '0 0 20px 0'
-              }}>
+          <div className="order-summary">
+            <div className="summary-box">
+              <h3 className="summary-title">
                 Order Summary
               </h3>
 
               {/* Coupon Code */}
-              <div style={{
-                display: 'flex',
-                gap: '10px',
-                marginBottom: '20px'
-              }}>
+              <div className="coupon-section">
                 <input
                   type="text"
                   placeholder="Coupon Code"
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value)}
                   disabled={couponStatus === 'loading'}
-                  style={{
-                    flex: 1,
-                    padding: '8px 12px',
-                    border: '1px solid #ddd',
-                    fontSize: '14px',
-                    outline: 'none',
-                    opacity: couponStatus === 'loading' ? 0.6 : 1
-                  }}
+                  className="coupon-input"
                 />
                 <button
                   onClick={handleApplyCoupon}
                   disabled={!couponCode.trim() || couponStatus === 'loading'}
-                  style={{
-                    padding: '8px 16px',
-                    backgroundColor: (!couponCode.trim() || couponStatus === 'loading') ? '#ccc' : '#E8A5C4',
-                    color: 'white',
-                    border: 'none',
-                    fontSize: '14px',
-                    cursor: (!couponCode.trim() || couponStatus === 'loading') ? 'not-allowed' : 'pointer',
-                    transition: 'background-color 0.2s'
-                  }}
-                  onMouseOver={(e) => {
-                    if (!e.target.disabled) {
-                      e.target.style.backgroundColor = '#E298BC';
-                    }
-                  }}
-                  onMouseOut={(e) => {
-                    if (!e.target.disabled) {
-                      e.target.style.backgroundColor = '#E8A5C4';
-                    }
-                  }}
+                  className="coupon-btn"
                 >
                   {couponStatus === 'loading' ? 'Applying...' : 'Apply'}
                 </button>
               </div>
               
               {appliedCoupon && (
-                <div style={{
-                  backgroundColor: '#d4edda',
-                  color: '#155724',
-                  padding: '8px 12px',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  marginBottom: '15px'
-                }}>
+                <div className="coupon-success">
                   Coupon "{appliedCoupon}" applied successfully!
                 </div>
               )}
 
-              <div style={{
-                paddingBottom: '15px',
-                marginBottom: '15px',
-                borderBottom: '1px solid #ddd'
-              }}>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginBottom: '12px'
-                }}>
-                  <span style={{ fontSize: '14px', color: '#666' }}>
+              <div className="summary-details">
+                <div className="summary-row">
+                  <span className="summary-label">
                     Subtotal ({itemCount} items)
                   </span>
-                  <span style={{ fontSize: '14px', color: '#333' }}>
+                  <span className="summary-value">
                     ${subtotal.toFixed(2)}
                   </span>
                 </div>
 
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginBottom: '12px'
-                }}>
-                  <span style={{ fontSize: '14px', color: '#666' }}>Shipping</span>
-                  <span style={{ fontSize: '14px', color: '#E8A5C4', fontWeight: '500' }}>
+                <div className="summary-row">
+                  <span className="summary-label">Shipping</span>
+                  <span className="summary-value free">
                     Free
                   </span>
                 </div>
                 
                 {totalAfterDiscount && totalAfterDiscount < subtotal && (
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    marginBottom: '12px'
-                  }}>
-                    <span style={{ fontSize: '14px', color: '#28a745' }}>Discount</span>
-                    <span style={{ fontSize: '14px', color: '#28a745', fontWeight: '500' }}>
+                  <div className="summary-row">
+                    <span className="summary-label">Discount</span>
+                    <span className="summary-value discount">
                       -${(subtotal - totalAfterDiscount).toFixed(2)}
                     </span>
                   </div>
                 )}
               </div>
 
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginBottom: '25px'
-              }}>
-                <span style={{ fontSize: '16px', fontWeight: '500', color: '#333' }}>
+              <div className="summary-total">
+                <span className="total-label">
                   Total ({itemCount} items)
                 </span>
-                <span style={{ fontSize: '16px', fontWeight: '500', color: '#333' }}>
+                <span className="total-value">
                   ${finalTotal.toFixed(2)}
                 </span>
               </div>
@@ -744,60 +464,14 @@ function Cart() {
               {/* Checkout Button */}
               <button
                 disabled={!products?.length || isUpdating}
-                style={{
-                  width: '100%',
-                  padding: '15px',
-                  backgroundColor: (!products?.length || isUpdating) ? '#ccc' : '#E8A5C4',
-                  color: 'white',
-                  border: 'none',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: (!products?.length || isUpdating) ? 'not-allowed' : 'pointer',
-                  transition: 'background-color 0.2s',
-                  marginBottom: '15px'
-                }}
-                onMouseOver={(e) => {
-                  if (!e.target.disabled) {
-                    e.target.style.backgroundColor = '#E298BC';
-                  }
-                }}
-                onMouseOut={(e) => {
-                  if (!e.target.disabled) {
-                    e.target.style.backgroundColor = '#E8A5C4';
-                  }
-                }}
+                className="checkout-btn"
                 onClick={() => navigate("/checkout")}
               >
                 {isUpdating ? 'Updating...' : 'Proceed to Checkout'}
               </button>
 
               {/* Continue Shopping */}
-              <Link
-                to="/home"
-                style={{
-                  display: 'block',
-                  width: '100%',
-                  padding: '12px',
-                  backgroundColor: 'transparent',
-                  color: '#666',
-                  border: '1px solid #ddd',
-                  fontSize: '14px',
-                  fontWeight: '400',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  textAlign: 'center',
-                  textDecoration: 'none',
-                  boxSizing: 'border-box'
-                }}
-                onMouseOver={(e) => {
-                  e.target.style.backgroundColor = '#f8f9fa';
-                  e.target.style.borderColor = '#ccc';
-                }}
-                onMouseOut={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                  e.target.style.borderColor = '#ddd';
-                }}
-              >
+              <Link to="/home" className="continue-shopping">
                 Continue Shopping
               </Link>
             </div>
