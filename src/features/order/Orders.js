@@ -48,12 +48,16 @@ export default function Orders() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [editMode, setEditMode] = useState(false);
+  const [editingEmail, setEditingEmail] = useState(false);
+  const [editingPassword, setEditingPassword] = useState(false);
   const [formData, setFormData] = useState({
     firstname: user?.firstname || '',
     lastname: user?.lastname || '',
     email: user?.email || '',
     mobile: user?.mobile || '',
     address: user?.address || '',
+    password: '',
+    confirmPassword: '',
   });
 
   const bgColorr = useColorModeValue("gray.50", "gray.900");
@@ -301,10 +305,10 @@ export default function Orders() {
                 Cancel
               </Button>
               <Button
-                bg="black"
+                bg="#E8A5C4"
                 color="white"
                 size="sm"
-                _hover={{ bg: "gray.800" }}
+                _hover={{ bg: "#E298BC" }}
                 px={6}
                 onClick={handleUpdateProfile}
               >
@@ -332,18 +336,82 @@ export default function Orders() {
             <Text fontSize="sm" color="black" fontWeight="medium" w="100px">
               Email
             </Text>
-            <Text fontSize="sm" color="gray.500" flex={1}>
-              {user?.email || 'Not provided'}
-            </Text>
-            <Button
-              variant="link"
-              color="blue.500"
-              fontSize="sm"
-              fontWeight="normal"
-              onClick={() => navigate('/change-email')}
-            >
-              Change
-            </Button>
+            {editingEmail ? (
+              <HStack flex={1} spacing={2}>
+                <Input
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  bg="white"
+                  border="1px"
+                  borderColor="gray.300"
+                  borderRadius="md"
+                  h="32px"
+                  fontSize="sm"
+                  placeholder="Enter new email"
+                />
+                <Button
+                  size="xs"
+                  bg="#E8A5C4"
+                  color="white"
+                  _hover={{ bg: "#E298BC" }}
+                  onClick={async () => {
+                    try {
+                      await userAPI.updateProfile({
+                        firstname: user?.firstname,
+                        lastname: user?.lastname,
+                        email: formData.email,
+                        mobile: user?.mobile
+                      });
+                      setEditingEmail(false);
+                      toast({
+                        title: "Email Updated",
+                        description: "Your email has been updated successfully",
+                        status: "success",
+                        duration: 3000,
+                        isClosable: true,
+                      });
+                    } catch (error) {
+                      toast({
+                        title: "Error updating email",
+                        description: error.message || "Failed to update email",
+                        status: "error",
+                        duration: 5000,
+                        isClosable: true,
+                      });
+                    }
+                  }}
+                >
+                  Save
+                </Button>
+                <Button
+                  size="xs"
+                  variant="outline"
+                  onClick={() => {
+                    setFormData(prev => ({ ...prev, email: user?.email || '' }));
+                    setEditingEmail(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </HStack>
+            ) : (
+              <>
+                <Text fontSize="sm" color="gray.500" flex={1}>
+                  {user?.email || 'Not provided'}
+                </Text>
+                <Button
+                  variant="link"
+                  color="#E8A5C4"
+                  fontSize="sm"
+                  fontWeight="normal"
+                  _hover={{ color: "#E298BC" }}
+                  onClick={() => setEditingEmail(true)}
+                >
+                  Change
+                </Button>
+              </>
+            )}
           </HStack>
 
           <HStack justify="space-between" align="center" py={3}>
@@ -399,18 +467,104 @@ export default function Orders() {
             <Text fontSize="sm" color="black" fontWeight="medium" w="100px">
               Password
             </Text>
-            <Text fontSize="sm" color="gray.500" flex={1}>
-              ••••••••••••••••••••
-            </Text>
-            <Button
-              variant="link"
-              color="blue.500"
-              fontSize="sm"
-              fontWeight="normal"
-              onClick={() => navigate('/change-password')}
-            >
-              Change
-            </Button>
+            {editingPassword ? (
+              <VStack flex={1} spacing={2} align="stretch">
+                <Input
+                  name="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  bg="white"
+                  border="1px"
+                  borderColor="gray.300"
+                  borderRadius="md"
+                  h="32px"
+                  fontSize="sm"
+                  placeholder="Enter new password"
+                />
+                <Input
+                  name="confirmPassword"
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  bg="white"
+                  border="1px"
+                  borderColor="gray.300"
+                  borderRadius="md"
+                  h="32px"
+                  fontSize="sm"
+                  placeholder="Confirm new password"
+                />
+                <HStack spacing={2} justify="flex-end">
+                  <Button
+                    size="xs"
+                    bg="#E8A5C4"
+                    color="white"
+                    _hover={{ bg: "#E298BC" }}
+                    onClick={async () => {
+                      if (formData.password === formData.confirmPassword && formData.password.length >= 6) {
+                        try {
+                          await userAPI.updatePassword(formData.password);
+                          setEditingPassword(false);
+                          setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
+                          toast({
+                            title: "Password Updated",
+                            description: "Your password has been updated successfully",
+                            status: "success",
+                            duration: 3000,
+                            isClosable: true,
+                          });
+                        } catch (error) {
+                          toast({
+                            title: "Error updating password",
+                            description: error.message || "Failed to update password",
+                            status: "error",
+                            duration: 5000,
+                            isClosable: true,
+                          });
+                        }
+                      } else {
+                        toast({
+                          title: "Password Error",
+                          description: "Passwords must match and be at least 6 characters long",
+                          status: "error",
+                          duration: 3000,
+                          isClosable: true,
+                        });
+                      }
+                    }}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    size="xs"
+                    variant="outline"
+                    onClick={() => {
+                      setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
+                      setEditingPassword(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </HStack>
+              </VStack>
+            ) : (
+              <>
+                <Text fontSize="sm" color="gray.500" flex={1}>
+                  ••••••••••••••••••••
+                </Text>
+                <Button
+                  variant="link"
+                  color="#E8A5C4"
+                  fontSize="sm"
+                  fontWeight="normal"
+                  _hover={{ color: "#E298BC" }}
+                  onClick={() => setEditingPassword(true)}
+                >
+                  Change
+                </Button>
+              </>
+            )}
           </HStack>
 
           {/* Account Status */}
@@ -424,10 +578,11 @@ export default function Orders() {
             {user?.isBlocked && (
               <Button
                 variant="link"
-                color="blue.500"
+                color="#E8A5C4"
                 fontSize="sm"
                 fontWeight="normal"
-                onClick={() => navigate('/contact-support')}
+                _hover={{ color: "#E298BC" }}
+                onClick={() => navigate('/contact')}
               >
                 Contact Support
               </Button>
@@ -439,9 +594,18 @@ export default function Orders() {
         <VStack spacing={4} mt={8} align="start">
           <Button
             variant="outline"
-            colorScheme="red"
+            borderColor="red.400"
+            color="red.400"
             size="sm"
+            _hover={{ bg: "red.50" }}
             onClick={() => {
+              toast({
+                title: "Account Deletion",
+                description: "Please contact support to delete your account",
+                status: "warning",
+                duration: 5000,
+                isClosable: true,
+              });
             }}
           >
             Delete Account
@@ -1089,7 +1253,9 @@ export default function Orders() {
         </Alert>
         <Button 
           mt={4} 
-          colorScheme="pink" 
+          bg="#E8A5C4"
+          color="white"
+          _hover={{ bg: "#E298BC" }}
           onClick={handleRefresh} 
           disabled={!userId}
         >
@@ -1108,7 +1274,13 @@ export default function Orders() {
             <Text fontSize="xl" color="gray.600">
               Please log in to view your orders
             </Text>
-            <Button as={Link} to="/login" colorScheme="pink">
+            <Button 
+              as={Link} 
+              to="/login" 
+              bg="#E8A5C4"
+              color="white"
+              _hover={{ bg: "#E298BC" }}
+            >
               Login
             </Button>
           </VStack>
@@ -1129,16 +1301,26 @@ export default function Orders() {
               <Button
                 leftIcon={<FiRefreshCw />}
                 variant="outline"
+                borderColor="#E8A5C4"
+                color="#E8A5C4"
                 size="sm"
                 onClick={handleRefresh}
                 disabled={status === 'loading'}
+                _hover={{ 
+                  bg: "#E8A5C4", 
+                  color: "white",
+                  borderColor: "#E8A5C4" 
+                }}
               >
                 Refresh
               </Button>
               <Button
                 leftIcon={<FiLogOut />}
+                bg="#E8A5C4"
+                color="white"
                 size="sm"
                 onClick={handleLogout}
+                _hover={{ bg: "#E298BC" }}
               >
                 Logout
               </Button>
@@ -1161,10 +1343,10 @@ export default function Orders() {
                   variant="ghost"
                   justifyContent="flex-start"
                   onClick={() => setActiveTab(tab.id)}
-                  bg={activeTab === tab.id ? "gray.100" : "transparent"}
-                  color={activeTab === tab.id ? "black" : "gray.600"}
+                  bg={activeTab === tab.id ? "#F8E8F3" : "transparent"}
+                  color={activeTab === tab.id ? "#E8A5C4" : "gray.600"}
                   fontWeight={activeTab === tab.id ? "semibold" : "normal"}
-                  _hover={{ bg: "gray.50" }}
+                  _hover={{ bg: activeTab === tab.id ? "#F8E8F3" : "gray.50" }}
                 >
                   <HStack justify="space-between" w="full">
                     <Text>{tab.name}</Text>

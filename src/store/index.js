@@ -17,6 +17,7 @@ import colorSlice from '../features/admin/colorSlice';
 import couponSlice from '../features/admin/couponSlice';
 import loaderReducer from '../features/utils/loadersSlice'; 
 import faqReducer from '../features/faqs/faqSlice';
+import bannersReducer from '../features/components/bannersSlice';
 
 const store = configureStore({
   reducer: {
@@ -37,6 +38,7 @@ const store = configureStore({
     coupons: couponSlice,
     loader: loaderReducer,
     faqs: faqReducer,
+    banners: bannersReducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(loaderMiddleware),
 });

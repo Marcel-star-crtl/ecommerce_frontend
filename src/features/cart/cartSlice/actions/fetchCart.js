@@ -5,15 +5,18 @@ export const fetchCart = createAsyncThunk(
   "cart/fetchCart",
   async (_, thunkAPI) => {
     try {
-      const response = await api.get("/user/get-cart/");
+      console.log('🛒 Fetching cart...');
+      const response = await api.get("/user/get-cart");
+      console.log('📦 Cart response:', response.data);
       
       return {
-        products: response.data.products || [],
-        id: response.data._id,
-        total_price: response.data.cartTotal || 0
+        products: response.data.cart?.products || [],
+        id: response.data.cart?._id,
+        total_price: response.data.cart?.cartTotal || response.data.cartTotal || 0
       };
       
     } catch (err) {
+      console.error('❌ Fetch cart error:', err);
       return thunkAPI.rejectWithValue(err.message);
     }
   }
@@ -23,9 +26,11 @@ export const deleteCartProduct = createAsyncThunk(
   "cart/deleteCartProduct",
   async (productId, thunkAPI) => {
     try {
-      await api.delete(`user/delete-cart-product/${productId}/`);
+      console.log('🗑️ Deleting cart product:', productId);
+      await api.delete(`user/cart/${productId}`);
       return productId;
     } catch (err) {
+      console.error('❌ Delete cart product error:', err);
       return thunkAPI.rejectWithValue(err.message);
     }
   }

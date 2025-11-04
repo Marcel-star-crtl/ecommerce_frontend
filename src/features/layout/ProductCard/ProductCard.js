@@ -13,6 +13,18 @@ import { addToCart, fetchCart } from "../../cart/cartSlice";
 
 import styles from "./style.module.css";
 
+// Helper function to truncate HTML content
+const truncateHTML = (html, maxLength = 100) => {
+  if (!html) return '';
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  const text = div.textContent || div.innerText || '';
+  if (text.length <= maxLength) return html;
+  
+  // Return truncated text with ellipsis
+  return text.substring(0, maxLength) + '...';
+};
+
 function ProductCard({ product }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -20,19 +32,49 @@ function ProductCard({ product }) {
   const { isLoggedIn } = useSelector((state) => state.auth);
 
   const handleAddToCart = async () => {
+    console.log('Add to cart clicked for product:', product.title);
+    console.log('User logged in:', isLoggedIn);
+    
     if (!isLoggedIn) {
+      console.log('User not logged in, redirecting to login');
       navigate("/login");
       return;
     }
-    const result = await dispatch(addToCart({ product, quantity: 1 }));
-    if (addToCart.fulfilled.match(result)) {
-      dispatch(fetchCart());
+    
+    try {
+      console.log('Dispatching addToCart with product:', product._id);
+      const result = await dispatch(addToCart({ product, quantity: 1 }));
+      
+      if (addToCart.fulfilled.match(result)) {
+        console.log('Add to cart successful, fetching updated cart');
+        dispatch(fetchCart());
+        // You can add a success toast here if needed
+      } else if (addToCart.rejected.match(result)) {
+        console.error('Add to cart failed:', result.payload);
+        // You can add an error toast here if needed
+      }
+    } catch (error) {
+      console.error('Error in handleAddToCart:', error);
     }
   };
 
   return (
-    <div className="p-0" style={{ paddingRight: '10px', paddingLeft: '10px', marginBottom: '20px' }}>
-      <div className={`${styles.product}`}>
+    <div className="p-0" style={{ 
+      paddingRight: '10px', 
+      paddingLeft: '10px', 
+      marginBottom: '20px', 
+      height: '100%',
+      width: '100%',
+      maxWidth: '100%',
+      overflow: 'hidden',
+      boxSizing: 'border-box'
+    }}>
+      <div className={`${styles.product}`} style={{ 
+        height: '100%',
+        width: '100%',
+        maxWidth: '100%',
+        overflow: 'hidden'
+      }}>
         <MDBCard 
           className="border-0"
           style={{ 
@@ -40,14 +82,18 @@ function ProductCard({ product }) {
             backgroundColor: '#ffffff',
             overflow: 'hidden',
             boxShadow: 'none',
-            height: '100%'
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+            maxWidth: '100%'
           }}
         >
           {/* Product Image Section */}
           <div 
             className="position-relative d-flex align-items-center justify-content-center"
             style={{ 
-              height: '280px', 
+              height: '350px', 
               width: '100%',
               backgroundColor: '#f8f9fa',
               padding: '0px',
@@ -87,7 +133,7 @@ function ProductCard({ product }) {
                   alt={product.title}
                   className={`img-fluid ${styles.mainImg}`}
                   style={{ 
-                    height: '280px',
+                    height: '350px',
                     width: '100%',
                     objectFit: 'cover',
                     display: 'block'
@@ -98,7 +144,17 @@ function ProductCard({ product }) {
           </div>
 
           {/* Product Details Section */}
-          <div className="px-3" style={{ paddingTop: '20px', paddingBottom: '20px' }}>
+          <div className="px-3" style={{ 
+            paddingTop: '20px', 
+            paddingBottom: '20px', 
+            flex: '1', 
+            display: 'flex', 
+            flexDirection: 'column',
+            width: '100%',
+            maxWidth: '100%',
+            overflow: 'hidden',
+            boxSizing: 'border-box'
+          }}>
             <Link 
               to={`/product/${product._id}`}
               className="text-decoration-none"
@@ -110,7 +166,13 @@ function ProductCard({ product }) {
                   color: '#000000',
                   fontWeight: '400',
                   lineHeight: '1.4',
-                  fontFamily: 'Arial, sans-serif'
+                  fontFamily: 'Arial, sans-serif',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  minHeight: '50px'
                 }}
               >
                 {product.title}
@@ -118,21 +180,35 @@ function ProductCard({ product }) {
             </Link>
 
             {/* Product Description */}
-            <p 
-              className="mb-3" 
+            <div 
+              className={`mb-3 ${styles.productDescription}`}
               style={{ 
                 fontSize: '14px',
                 color: '#666666',
                 fontWeight: '400',
-                lineHeight: '1.3',
-                fontFamily: 'Arial, sans-serif'
+                lineHeight: '1.5',
+                fontFamily: 'Arial, sans-serif',
+                minHeight: '63px',
+                maxHeight: '63px',
+                overflow: 'hidden',
+                display: '-webkit-box',
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: 'vertical',
+                textOverflow: 'ellipsis',
+                wordBreak: 'break-word',
+                whiteSpace: 'normal',
+                width: '100%',
+                maxWidth: '100%',
+                flex: '0 0 auto',
+                overflowWrap: 'break-word'
               }}
-            >
-              {product.description || 'A gently formation'}
-            </p>
+              dangerouslySetInnerHTML={{ 
+                __html: product.description || 'A gently formation' 
+              }}
+            />
 
             {/* Add to Cart Button */}
-            <div className="d-grid">
+            <div className="d-grid" style={{ marginTop: 'auto' }}>
               <button
                 className="btn border-0"
                 style={{

@@ -11,6 +11,8 @@ const CheckoutPage = () => {
   const { products: cartProducts, cartId } = useSelector((state) => state.cart);
   const user = useSelector((state) => state.auth.user);
   
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const subtotal = cartProducts?.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0) || 0;
   const deliveryCost = 0; 
   const discount = 0; 
@@ -132,6 +134,8 @@ const CheckoutPage = () => {
       return;
     }
   
+    setIsSubmitting(true);
+    
     try {
       let paymentResult = null;
 
@@ -159,10 +163,11 @@ const CheckoutPage = () => {
       const orderData = {
         cartId,
         products: cartProducts.map(item => ({
-          productId: item.id || item._id,
-          name: item.name || item.title,
-          quantity: item.quantity || 1,
-          price: item.price,
+          productId: item.product?._id || item.productId || item._id,  // Get the actual product ID
+          name: item.product?.title || item.name || item.title,
+          quantity: item.count || item.quantity || 1,
+          price: item.product?.price || item.price,
+          color: item.color || 'default',
           image: getCheckoutItemImageUrl(item) 
         })),
         totalAmount: totalPay,
@@ -187,12 +192,38 @@ const CheckoutPage = () => {
       const resultAction = await dispatch(createOrder(orderData));
       
       if (createOrder.fulfilled.match(resultAction)) {
+        const orderId = resultAction.payload.orderId;
+        
+        // Create WhatsApp message with order details
+        const whatsappNumber = '237683340380'; // Cameroon country code + number
+        const orderSummary = `Hello! I just placed an order on SHYNEEN.\n\n` +
+          `*Order ID:* ${orderId}\n` +
+          `*Name:* ${formData.firstName} ${formData.lastName}\n` +
+          `*Phone:* ${formData.phone}\n` +
+          `*Address:* ${formData.address}, ${formData.city}, ${formData.country}\n` +
+          `*Total Amount:* $${totalPay.toFixed(2)}\n` +
+          `*Payment Method:* ${formData.paymentMethod}\n\n` +
+          `*Products:*\n` +
+          cartProducts.map((item, idx) => 
+            `${idx + 1}. ${item.product?.title || item.title} x${item.count || item.quantity} - $${((item.product?.price || item.price) * (item.count || item.quantity)).toFixed(2)}`
+          ).join('\n') +
+          `\n\nPlease confirm my order. Thank you!`;
+        
+        // Encode the message for URL
+        const encodedMessage = encodeURIComponent(orderSummary);
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+        
+        // Open WhatsApp in a new tab
+        window.open(whatsappUrl, '_blank');
+        
+        // Navigate to success page
         navigate('/checkout/success', { 
           state: { 
-            orderId: resultAction.payload.orderId,
+            orderId: orderId,
             amount: totalPay,
             paymentMethod: formData.paymentMethod,
-            paymentDetails: paymentResult
+            paymentDetails: paymentResult,
+            whatsappSent: true
           } 
         });
       } else {
@@ -201,6 +232,8 @@ const CheckoutPage = () => {
     } catch (error) {
       console.error('Order error:', error);
       alert(error.message || 'Order failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -353,55 +386,6 @@ const CheckoutPage = () => {
                   borderBottom: '1px solid #e5e5e5',
                   paddingBottom: '10px'
                 }}>
-                  Delivery Method
-                </h2>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '15px'
-                }}>
-                  <div>
-                    <input 
-                      type="text" 
-                      placeholder="First Name"
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        outline: 'none',
-                        transition: 'border-color 0.2s'
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <input 
-                      type="text" 
-                      placeholder="First Name"
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        outline: 'none',
-                        transition: 'border-color 0.2s'
-                      }}
-                    />
-                  </div>
-                </div>
-              </section>
-
-              <section style={{ marginBottom: '40px' }}>
-                <h2 style={{
-                  fontSize: '18px',
-                  fontWeight: '600',
-                  color: '#333',
-                  marginBottom: '20px',
-                  borderBottom: '1px solid #e5e5e5',
-                  paddingBottom: '10px'
-                }}>
                   Shipping Information
                 </h2>
                 <div style={{
@@ -493,329 +477,6 @@ const CheckoutPage = () => {
                     />
                   </div>
                 </div>
-              </section>
-
-              {/* Payment Method */}
-              <section style={{ marginBottom: '30px' }}>
-                <h2 style={{
-                    fontSize: '18px',
-                    fontWeight: '600',
-                    color: '#333',
-                    marginBottom: '20px',
-                    borderBottom: '1px solid #e5e5e5',
-                    paddingBottom: '10px'
-                }}>
-                    Payment Method
-                </h2>
-                
-                <div style={{ marginBottom: '20px' }}>
-                    {/* Cash on Delivery */}
-                    <label style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '15px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        marginBottom: '10px',
-                        cursor: 'pointer',
-                        backgroundColor: formData.paymentMethod === 'cod' ? '#f8f9ff' : 'white'
-                    }}>
-                        <input 
-                            type="radio" 
-                            name="paymentMethod" 
-                            value="cod" 
-                            checked={formData.paymentMethod === 'cod'} 
-                            onChange={handleChange}
-                            style={{ marginRight: '10px' }}
-                        />
-                        <span style={{ fontWeight: '500' }}>Cash on Delivery</span>
-                    </label>
-
-                    {/* MTN Mobile Money */}
-                    <label style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '15px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        marginBottom: '10px',
-                        cursor: 'pointer',
-                        backgroundColor: formData.paymentMethod === 'mobile_money_mtn' ? '#f8f9ff' : 'white'
-                    }}>
-                        <input 
-                            type="radio" 
-                            name="paymentMethod" 
-                            value="mobile_money_mtn" 
-                            checked={formData.paymentMethod === 'mobile_money_mtn'} 
-                            onChange={handleChange}
-                            style={{ marginRight: '10px' }}
-                        />
-                        <div>
-                            <span style={{ fontWeight: '500' }}>MTN Mobile Money</span>
-                            <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                                Pay with your MTN Mobile Money account
-                            </div>
-                        </div>
-                    </label>
-
-                    {/* Orange Money */}
-                    <label style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '15px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        marginBottom: '10px',
-                        cursor: 'pointer',
-                        backgroundColor: formData.paymentMethod === 'mobile_money_orange' ? '#f8f9ff' : 'white'
-                    }}>
-                        <input 
-                            type="radio" 
-                            name="paymentMethod" 
-                            value="mobile_money_orange" 
-                            checked={formData.paymentMethod === 'mobile_money_orange'} 
-                            onChange={handleChange}
-                            style={{ marginRight: '10px' }}
-                        />
-                        <div>
-                            <span style={{ fontWeight: '500' }}>Orange Money</span>
-                            <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                                Pay with your Orange Money account
-                            </div>
-                        </div>
-                    </label>
-
-                    {/* Credit Card */}
-                    <label style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '15px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        marginBottom: '10px',
-                        cursor: 'pointer',
-                        backgroundColor: formData.paymentMethod === 'card' ? '#f8f9ff' : 'white'
-                    }}>
-                        <input 
-                            type="radio" 
-                            name="paymentMethod" 
-                            value="card" 
-                            checked={formData.paymentMethod === 'card'} 
-                            onChange={handleChange}
-                            style={{ marginRight: '10px' }}
-                        />
-                        <div>
-                            <span style={{ fontWeight: '500' }}>Credit/Debit Card</span>
-                            <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                                Visa, Mastercard, American Express
-                            </div>
-                        </div>
-                    </label>
-                </div>
-                
-                {/* Payment Method Specific Content */}
-                {formData.paymentMethod === 'cod' && (
-                    <div style={{
-                        padding: '15px',
-                        backgroundColor: '#f8f9fa',
-                        borderRadius: '4px',
-                        marginBottom: '20px'
-                    }}>
-                        <p style={{ margin: 0, color: '#666' }}>
-                            You'll pay when you receive your order
-                        </p>
-                    </div>
-                )}
-
-                {/* Mobile Money Phone Number Input */}
-                {(formData.paymentMethod === 'mobile_money_mtn' || formData.paymentMethod === 'mobile_money_orange') && (
-                    <div style={{ 
-                        padding: '15px',
-                        backgroundColor: '#f8f9fa',
-                        borderRadius: '4px',
-                        marginBottom: '20px'
-                    }}>
-                        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
-                            Mobile Money Phone Number
-                        </label>
-                        <input
-                            type="tel"
-                            name="mobileMoneyPhone"
-                            value={formData.mobileMoneyPhone || ''}
-                            onChange={handleChange}
-                            placeholder="e.g., 237670000000"
-                            required
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                border: '1px solid #ddd',
-                                borderRadius: '4px',
-                                fontSize: '14px',
-                                outline: 'none',
-                                transition: 'border-color 0.2s'
-                            }}
-                        />
-                        <small style={{ color: '#666', fontSize: '12px', marginTop: '5px', display: 'block' }}>
-                            Please enter your phone number with country code (e.g., 237 for Cameroon)
-                        </small>
-                    </div>
-                )}
-
-                {/* Payment Method Specific Content */}
-                {formData.paymentMethod === 'cod' && (
-                    <div style={{ 
-                        padding: '15px',
-                        backgroundColor: '#f8f9fa',
-                        borderRadius: '4px',
-                        marginBottom: '20px'
-                    }}>
-                        <p style={{ margin: 0, color: '#666' }}>
-                            You'll pay when you receive your order
-                        </p>
-                    </div>
-                )}
-
-                {/* Mobile Money Phone Number Input */}
-                {(formData.paymentMethod === 'mobile_money_mtn' || formData.paymentMethod === 'mobile_money_orange') && (
-                    <div style={{ 
-                        padding: '15px',
-                        backgroundColor: '#f8f9fa',
-                        borderRadius: '4px',
-                        marginBottom: '20px'
-                    }}>
-                        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
-                            Mobile Money Phone Number
-                        </label>
-                        <input
-                            type="tel"
-                            name="phoneNumber"
-                            value={formData.phoneNumber || ''}
-                            onChange={handleChange}
-                            placeholder="e.g., 237670000000"
-                            required
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                border: '1px solid #ddd',
-                                borderRadius: '4px',
-                                fontSize: '14px',
-                                outline: 'none',
-                                transition: 'border-color 0.2s'
-                            }}
-                        />
-                        <small style={{ color: '#666', fontSize: '12px', marginTop: '5px', display: 'block' }}>
-                            Please enter your phone number with country code (e.g., 237 for Cameroon)
-                        </small>
-                    </div>
-                )}
-
-              {/* Card Details Section */}
-              {formData.paymentMethod === 'card' && (
-                <>
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '15px',
-                    marginBottom: '15px'
-                  }}>
-                  <div>
-                    <input 
-                      type="text" 
-                      name="cardNumber" 
-                      value={formData.cardNumber} 
-                      onChange={handleChange} 
-                      placeholder="Card Number"
-                      required
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        outline: 'none',
-                        transition: 'border-color 0.2s'
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <input 
-                      type="text" 
-                      name="cardName" 
-                      value={formData.cardName} 
-                      onChange={handleChange} 
-                      placeholder="Cardholder Full Name"
-                      required
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        outline: 'none',
-                        transition: 'border-color 0.2s'
-                      }}
-                    />
-                  </div>
-                </div>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '15px',
-                  marginBottom: '15px'
-                }}>
-                  <div>
-                    <input 
-                      type="text" 
-                      name="cardExpiry" 
-                      value={formData.cardExpiry} 
-                      onChange={handleChange} 
-                      placeholder="MM/YY"
-                      required
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        outline: 'none',
-                        transition: 'border-color 0.2s'
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <input 
-                      type="text" 
-                      name="cardCvv" 
-                      value={formData.cardCvv} 
-                      onChange={handleChange} 
-                      placeholder="CVV"
-                      required
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        outline: 'none',
-                        transition: 'border-color 0.2s'
-                      }}
-                    />
-                  </div>
-                </div>
-                
-                <label style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  fontSize: '14px',
-                  color: '#666',
-                  cursor: 'pointer',
-                  marginBottom: '20px'
-                }}>
-                  
-                  login to save card information for next orders
-                </label>
-                </>
-              )}
               </section>
 
               {/* Terms and Conditions */}
@@ -1044,22 +705,24 @@ const CheckoutPage = () => {
             {/* Pay Now Button */}
             <button
               onClick={handleSubmit}
+              disabled={isSubmitting}
               style={{
                 width: '100%',
                 padding: '15px',
-                backgroundColor: '#E8A5C4',
+                backgroundColor: isSubmitting ? '#ccc' : '#E8A5C4',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
                 fontSize: '16px',
                 fontWeight: '500',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s'
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                transition: 'background-color 0.2s',
+                opacity: isSubmitting ? 0.7 : 1
               }}
-              onMouseOver={(e) => e.target.style.backgroundColor = '#E8A5C4'}
-              onMouseOut={(e) => e.target.style.backgroundColor = '#E8A5C4'}
+              onMouseOver={(e) => !isSubmitting && (e.target.style.backgroundColor = '#E8A5C4')}
+              onMouseOut={(e) => !isSubmitting && (e.target.style.backgroundColor = '#E8A5C4')}
             >
-              Pay Now
+              {isSubmitting ? 'Processing...' : 'Pay Now'}
             </button>
             
             {/* Terms and Conditions */}

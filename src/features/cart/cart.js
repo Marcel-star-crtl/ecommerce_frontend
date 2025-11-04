@@ -74,17 +74,20 @@ function Cart() {
     );
   }, [incrementStatus, decrementStatus, deleteStatus, emptyStatus]);
 
-  const updateQuantity = async (id, newQuantity) => {
+  const updateQuantity = async (productId, newQuantity) => {
     if (isUpdating) return; 
     
     if (newQuantity < 1) {
-      handleDeleteItem(id);
+      handleDeleteItem(productId);
       return;
     }
 
-    const currentItem = products.find(item => (item.id || item._id) === id);
+    // Find the cart item using the product ID
+    const currentItem = products.find(item => 
+      (item.product?._id || item.productId || item.id || item._id) === productId
+    );
     if (!currentItem) {
-      console.error('Item not found in cart:', id);
+      console.error('Item not found in cart:', productId);
       return;
     }
 
@@ -92,12 +95,12 @@ function Cart() {
     
     try {
       if (newQuantity > currentQuantity) {
-        console.log('Incrementing quantity for item:', id);
-        await dispatch(incrementCartProduct(id)).unwrap();
+        console.log('Incrementing quantity for item:', productId);
+        await dispatch(incrementCartProduct(productId)).unwrap();
         setCartToast('Item added to cart!');
       } else if (newQuantity < currentQuantity) {
-        console.log('Decrementing quantity for item:', id);
-        await dispatch(decrementCartProduct(id)).unwrap();
+        console.log('Decrementing quantity for item:', productId);
+        await dispatch(decrementCartProduct(productId)).unwrap();
         setCartToast('Item quantity updated!');
       }
       if (newQuantity !== currentQuantity) {
@@ -114,14 +117,21 @@ function Cart() {
     if (isUpdating) return;
     
     try {
-      console.log('Deleting item:', id);
+      console.log('🗑️ Attempting to delete item with ID:', id);
+      console.log('🗑️ Available products in cart:', products?.map(p => ({ 
+        id: p.id, 
+        _id: p._id, 
+        productId: p.product?._id,
+        name: p.name || p.title || p.product?.title 
+      })));
+      
       await dispatch(deleteCartProduct(id)).unwrap();
       setCartToast('Item removed from cart!');
       setTimeout(() => setCartToast(null), 2000);
     } catch (error) {
       setCartToast('Error removing item!');
       setTimeout(() => setCartToast(null), 2000);
-      console.error('Error deleting item:', error);
+      console.error('❌ Error deleting item:', error);
     }
   };
 
@@ -373,7 +383,8 @@ function Cart() {
           {/* Cart Items */}
           <div>
             {products?.map((item, index) => {
-              const itemId = item.id || item._id;
+              // Use the product ID for delete operations, not the cart item ID
+              const itemId = item.product?._id || item.productId || item.id || item._id;
               const itemQuantity = item.quantity || item.count || 1;
               const isItemUpdating = isUpdating;
               

@@ -32,7 +32,7 @@ export const removeFromWishlist = createAsyncThunk(
   "wishlist/removeFromWishlist",
   async (productId, thunkAPI) => {
     try { 
-  const response = await api.post("/wishlist/remove", { productId });
+      const response = await api.delete("/user/wishlist", { data: { prodId: productId } });
       return { productId, message: response.data.message };
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || err.message);
@@ -97,18 +97,12 @@ const wishlistSlice = createSlice({
       })
       .addCase(fetchWishlist.fulfilled, (state, action) => {
         state.fetchStatus = "succeeded";
-        if (action.payload.product_details) {
-          state.products = action.payload.product_details.results || [];
-          state.totalProductsCount = action.payload.product_details.count || 0;
-          state.currentPage = action.payload.product_details.page || 1;
-          state.totalPages = action.payload.product_details.pages || 1;
-        } else {
-          state.products = action.payload.products || [];
-          state.totalProductsCount = action.payload.count || 0;
-          state.currentPage = action.payload.page || 1;
-          state.totalPages = action.payload.pages || 1;
-        }
+        // Handle the actual API response structure
+        state.products = action.payload.products || [];
+        state.totalProductsCount = action.payload.products ? action.payload.products.length : 0;
         state.wishlistCount = state.totalProductsCount;
+        state.currentPage = 1;
+        state.totalPages = 1;
       })
       .addCase(fetchWishlist.rejected, (state, action) => {
         state.fetchStatus = "failed";

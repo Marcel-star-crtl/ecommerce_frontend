@@ -94,8 +94,8 @@ const SkinCare = () => {
             <div
               key={index}
               style={{
-                minWidth: windowWidth <= 480 ? '180px' : 
-                         windowWidth <= 768 ? '250px' : '300px',
+                minWidth: windowWidth <= 480 ? '150px' : 
+                         windowWidth <= 768 ? '200px' : '240px',
                 flexShrink: 0
               }}
             >
@@ -186,15 +186,9 @@ const SkinCare = () => {
               <div
                 key={product._id}
                 style={{
-                  minWidth: windowWidth <= 480 ? '180px' : 
-                           windowWidth <= 768 ? '250px' : '300px',
-                  maxWidth: windowWidth <= 480 ? '180px' : 
-                           windowWidth <= 768 ? '250px' : '300px',
-                  width: windowWidth <= 480 ? '180px' : 
-                         windowWidth <= 768 ? '250px' : '300px',
-                  flexShrink: 0,
-                  overflow: 'hidden',
-                  boxSizing: 'border-box'
+                  minWidth: windowWidth <= 480 ? '150px' : 
+                           windowWidth <= 768 ? '200px' : '240px',
+                  flexShrink: 0
                 }}
               >
                 <ProductCard product={product} />

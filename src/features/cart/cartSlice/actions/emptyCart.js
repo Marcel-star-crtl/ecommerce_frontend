@@ -1,14 +1,30 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { cartAPI } from '../../../../api/api';
+import api from '../../../../api/api';
 
 export const emptyCart = createAsyncThunk(
   'cart/emptyCart',
-  async (_, { rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
     try {
-      const response = await cartAPI.emptyCart();
+      console.log('🧹 Emptying cart...');
+      
+      const state = getState();
+      const isLoggedIn = state.auth.isLoggedIn;
+      const token = state.auth.token;
+      
+      if (!isLoggedIn || !token) {
+        return rejectWithValue("Please login to manage cart");
+      }
+
+      const response = await api.delete('/user/empty-cart');
+      console.log('✅ Empty cart response:', response.data);
+      
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.message);
+      console.error('❌ Empty cart error:', error);
+      const errorMessage = error.response?.data?.message || 
+                         error.message || 
+                         "Failed to empty cart";
+      return rejectWithValue(errorMessage);
     }
   }
 );

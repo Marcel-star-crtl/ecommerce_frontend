@@ -110,6 +110,8 @@ export const brandAPI = {
   getBrand: (id) => api.get(`/brand/${id}`),
   updateBrand: (id, title) => api.put(`/brand/${id}`, { title }),
   deleteBrand: (id) => api.delete(`/brand/${id}`),
+  getBrandContent: () => api.get('/brand/content/info'),
+  updateBrandContent: (data) => api.put('/brand/content/info', data),
 };
 
 // Color API
@@ -155,6 +157,18 @@ export const faqAPI = {
 export const videoAPI = {
   getVideos: () => api.get('/videos'),
   createVideo: (data) => api.post('/videos', data),
+};
+
+// Banner API
+export const bannerAPI = {
+  getBanners: (section) => api.get(`/banners${section ? `?section=${section}` : ''}`),
+  getHomepageBanners: () => api.get('/banners/homepage'),
+  getBanner: (id) => api.get(`/banners/${id}`),
+  createBanner: (data) => api.post('/banners', data),
+  updateBanner: (id, data) => api.put(`/banners/${id}`, data),
+  deleteBanner: (id) => api.delete(`/banners/${id}`),
+  getSectionContent: (sectionName) => api.get(`/banners/section/${sectionName}`),
+  updateSectionContent: (sectionName, data) => api.put(`/banners/section/${sectionName}`, data),
 };
 
 // Enquiry API

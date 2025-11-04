@@ -18,7 +18,7 @@ import Product from "./features/ProductDetails/ProductDetails";
 import Home from "./features/home/homePage";
 import Shops from "./features/shops/shopsPage";
 import Stores from "./features/stores/storesPage";
-import Orders from "./features/order/Orders";
+import ProfilePage from "./features/profile/ProfilePage";
 import ContactUs from "./features/contactus/ContactUs";
 import Aboutus from "./features/aboutus/Aboutus";
 import CheckoutPage from './features/checkout/CheckoutPage';
@@ -66,7 +66,7 @@ function App() {
           <Route element={<ProtectedRoutes requiresLogin={true} redirectTo="/login" />}>
             <Route path="wishlist" element={<WishList />} />
             <Route path="cart" element={<Cart />} />
-            <Route path="orders" element={<Orders />} />
+            <Route path="profile" element={<ProfilePage />} />
             <Route path="orders/:orderId" element={<OrderDetails />} />
           </Route>
           

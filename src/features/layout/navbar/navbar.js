@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../auth/authSlice";
 import { fetchCategories } from "../../Category/PopularCategories/popularCategoriesSlice";
 import { resetCart } from "../../cart/cartSlice";
+import { fetchWishlist } from "../../wishlist/wishlistSlice";
 import api from "../../../api/api";
 
 function Navbar() {
@@ -11,6 +12,7 @@ function Navbar() {
   const { cartCount } = useSelector((state) => state.cart);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const { categories } = useSelector((state) => state.categories);
+  const { wishlistCount } = useSelector((state) => state.wishlist);
 
   // Search functionality state
   const [showSearch, setShowSearch] = useState(false);
@@ -27,7 +29,11 @@ function Navbar() {
 
   useEffect(() => {
     dispatch(fetchCategories());
-  }, [dispatch]);
+    // Fetch wishlist count if user is logged in
+    if (isLoggedIn) {
+      dispatch(fetchWishlist({ page: 1, size: 1 })); // Just to get the count
+    }
+  }, [dispatch, isLoggedIn]);
 
   // Search functionality
   const handleSearch = (event) => {
@@ -237,21 +243,23 @@ function Navbar() {
                 >
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                 </svg>
-                <span
-                  className="position-absolute badge rounded-pill bg-danger"
-                  style={{
-                    top: window.innerWidth <= 768 ? '-6px' : '-8px',
-                    right: window.innerWidth <= 768 ? '-6px' : '-8px',
-                    fontSize: window.innerWidth <= 768 ? '9px' : '10px',
-                    minWidth: window.innerWidth <= 768 ? '14px' : '16px',
-                    height: window.innerWidth <= 768 ? '14px' : '16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  1
-                </span>
+                {wishlistCount > 0 && (
+                  <span
+                    className="position-absolute badge rounded-pill bg-danger"
+                    style={{
+                      top: window.innerWidth <= 768 ? '-6px' : '-8px',
+                      right: window.innerWidth <= 768 ? '-6px' : '-8px',
+                      fontSize: window.innerWidth <= 768 ? '9px' : '10px',
+                      minWidth: window.innerWidth <= 768 ? '14px' : '16px',
+                      height: window.innerWidth <= 768 ? '14px' : '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    {wishlistCount}
+                  </span>
+                )}
               </Link>
 
               {/* Cart Icon */}
@@ -374,7 +382,7 @@ function Navbar() {
               {/* Avatar Icon for Orders */}
               {isLoggedIn && (
                 <Link
-                  to="/orders"
+                  to="/profile"
                   className="text-decoration-none"
                   style={{ 
                     color: '#333',
@@ -655,7 +663,7 @@ function Navbar() {
             ) : (
               <>
                 <Link 
-                  to="/orders" 
+                  to="/profile" 
                   className="text-decoration-none text-dark py-2"
                   style={{ fontSize: '16px' }}
                 >

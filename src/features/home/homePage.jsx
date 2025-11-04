@@ -26,11 +26,18 @@ import { fetchProductHomePage, fetchRecentProducts } from "./productHomePageSlic
 import { fetchAllCategories } from "../Category/CategoryPage/categorySlice";
 import { fetchBestSellers } from '../ProductDetails/bestSellersSlice'; 
 import { fetchProducts } from "../ProductDetails/productSlice";
+import { fetchHomepageBanners } from "../components/bannersSlice";
+
+// Import CMS hook
+import { usePageContent } from "../../hooks/usePageContent";
 
 function Home() {
   const dispatch = useDispatch();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  
+  // Fetch CMS content for homepage
+  const { content: cmsContent, loading: cmsLoading } = usePageContent('homepage');
   
   // Track window resize for responsive behavior
   useEffect(() => {
@@ -57,22 +64,47 @@ function Home() {
     error: bestSellersError 
   } = useSelector((state) => state.bestSellers);
 
-  // Carousel slides data
-  const slides = [
+  const { 
+    heroBanners, 
+    originalBanners, 
+    loading: bannersLoading 
+  } = useSelector((state) => state.banners);
+
+  // Dynamic carousel slides data from CMS or API banners
+  const slides = heroBanners && heroBanners.length > 0 ? heroBanners.map(banner => ({
+    id: banner._id,
+    image: banner.image || process.env.PUBLIC_URL + "/assets/slide1.png",
+    title: banner.description,
+    buttonText: banner.buttonText || "Get Yours",
+    buttonLink: banner.buttonLink || "/products"
+  })) : cmsContent && cmsContent.heroSlides && cmsContent.heroSlides.length > 0 ? cmsContent.heroSlides.map((slide, idx) => ({
+    id: `cms-slide-${idx}`,
+    image: slide.image || process.env.PUBLIC_URL + "/assets/slide1.png",
+    title: slide.description || slide.title || "",
+    subtitle: slide.subtitle || '',
+    buttonText: slide.buttonText || "Get Yours",
+    buttonLink: slide.buttonLink || "/shops"
+  })) : [
     {
       id: 1,
       image: process.env.PUBLIC_URL + "/assets/slide1.png",
-      title: "This beauty product line was creatively designed to emphasize the flawless beauty of mother nature. We crafted the logo and mixed two natural colors to produce an elegant and enigmatic feeling to everyone who comes across this product."
+      title: "This beauty product line was creatively designed to emphasize the flawless beauty of mother nature. We crafted the logo and mixed two natural colors to produce an elegant and enigmatic feeling to everyone who comes across this product.",
+      buttonText: "Get Yours",
+      buttonLink: "/products"
     },
     {
       id: 2,
       image: process.env.PUBLIC_URL + "/assets/slide1.png",
-      title: "Discover our premium collection of skincare products designed for your natural glow."
+      title: "Discover our premium collection of skincare products designed for your natural glow.",
+      buttonText: "Shop Now",
+      buttonLink: "/products"
     },
     {
       id: 3,
       image: process.env.PUBLIC_URL + "/assets/slide1.png",
-      title: "Experience the perfect blend of nature and science in every product."
+      title: "Experience the perfect blend of nature and science in every product.",
+      buttonText: "Learn More",
+      buttonLink: "/philosophy"
     }
   ];
 
@@ -156,8 +188,8 @@ function Home() {
       pageSize: 8,
       page: 1 
     }));
-
     dispatch(fetchBestSellers());
+    dispatch(fetchHomepageBanners());
   }, [dispatch]);
 
   // Helper function to get image URL
@@ -211,7 +243,7 @@ function Home() {
               left: 0,
               width: '100%',
               height: '100%',
-              backgroundImage: `url(${slides[currentSlide].image})`,
+              backgroundImage: `url(${slides[currentSlide].image.startsWith('/') ? process.env.PUBLIC_URL + slides[currentSlide].image : slides[currentSlide].image})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
@@ -309,6 +341,19 @@ function Home() {
             maxWidth: windowWidth <= 768 ? '100%' : '600px',
             marginLeft: windowWidth <= 768 ? 0 : '50px'
           }}>
+            {slides[currentSlide].subtitle && (
+              <h3 style={{
+                color: '#E8A5C4',
+                fontSize: windowWidth <= 480 ? '16px' : '20px',
+                fontWeight: '600',
+                marginBottom: '10px',
+                textTransform: 'uppercase',
+                letterSpacing: '2px',
+                textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
+              }}>
+                {slides[currentSlide].subtitle}
+              </h3>
+            )}
             <p style={{
               color: 'white',
               fontSize: responsive.fontSize,
@@ -322,11 +367,13 @@ function Home() {
               WebkitLineClamp: windowWidth <= 480 ? 4 : 6,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden'
-            }}>
-              {windowWidth <= 480 
-                ? slides[currentSlide].title.substring(0, 150) + (slides[currentSlide].title.length > 150 ? '...' : '')
+            }}
+            dangerouslySetInnerHTML={{
+              __html: windowWidth <= 480 
+                ? (slides[currentSlide].title.substring(0, 150) + (slides[currentSlide].title.length > 150 ? '...' : ''))
                 : slides[currentSlide].title
-              }
+            }}
+            >
             </p>
 
             <button
@@ -351,9 +398,14 @@ function Home() {
                 e.target.style.backgroundColor = '#E8A5C4';
                 e.target.style.transform = 'translateY(0)';
               }}
-              onClick={() => console.log('Get Yours clicked')}
+              onClick={() => {
+                const currentSlideData = slides[currentSlide];
+                if (currentSlideData.buttonLink) {
+                  window.location.href = currentSlideData.buttonLink;
+                }
+              }}
             >
-              Get Yours
+              {slides[currentSlide].buttonText || "Get Yours"}
             </button>
           </div>
 
@@ -390,23 +442,25 @@ function Home() {
 
         {/* Trending Products Section with Animation */}
         <div className="container-fluid" style={{paddingTop: '70px'}}>
-          <h3 className={`${styles.sectionTitle} position-relative mx-xl-5 mb-2`}>
-            <span className="p-3 ps-0" style={{
-              color: "#F7A9C7",
-              fontSize: windowWidth <= 480 ? '20px' : windowWidth <= 768 ? '24px' : '28px'
-            }}>
-              Trending Products
-            </span>
-          </h3>
-          <h5 className={`${styles.sectionTitle} position-relative mx-xl-5 mb-4`}>
-            <span className="p-3 ps-0" style={{
-              color: "#000", 
-              fontSize: windowWidth <= 480 ? '14px' : '16px',
-              fontWeight: '300'
-            }}>
-              A gently formationA gently formationA gently formation
-            </span>
-          </h5>
+          <div style={{ marginBottom: '16px' }}>
+            <h3 className={`${styles.sectionTitle} position-relative mb-2`} style={{ margin: 0 }}>
+              <span style={{
+                color: "#F7A9C7",
+                fontSize: windowWidth <= 480 ? '20px' : windowWidth <= 768 ? '24px' : '28px'
+              }}>
+                {cmsContent?.trendingSection?.title || 'Trending Products'}
+              </span>
+            </h3>
+            <h5 className={`${styles.sectionTitle} position-relative mb-4`} style={{ margin: 0 }}>
+              <span style={{
+                color: "#000", 
+                fontSize: windowWidth <= 480 ? '14px' : '16px',
+                fontWeight: '300'
+              }}>
+                {cmsContent?.trendingSection?.subtitle || 'A gently formationA gently formationA gently formation'}
+              </span>
+            </h5>
+          </div>
 
           {trendingStatus === 'loading' ? (
             <div className="row pb-3">
@@ -468,33 +522,69 @@ function Home() {
           )}
         </div>
 
-        <Original 
-          backgroundImage={process.env.PUBLIC_URL + "/assets/original.png"}
-          textColor="gray.800"
-          descriptionColor="gray.700"
-        />
+        {/* Middle Banner Section - Original/Brand */}
+        {cmsContent?.middleBanner && cmsContent.middleBanner.image ? (
+          <Original 
+            backgroundImage={cmsContent.middleBanner.image}
+            title={cmsContent.middleBanner.title || 'Original Shyneen Facial Cleaner'}
+            description={cmsContent.middleBanner.description || 'This beauty product line was creatively designed to emphasize the flawless beauty of mother nature.'}
+            buttonText={cmsContent.middleBanner.buttonText || 'Get Yours'}
+            onButtonClick={() => {
+              if (cmsContent.middleBanner.buttonLink) {
+                window.location.href = cmsContent.middleBanner.buttonLink;
+              }
+            }}
+            textColor="gray.800"
+            descriptionColor="gray.700"
+          />
+        ) : originalBanners && originalBanners.length > 0 ? (
+          originalBanners.slice(0, 1).map((banner, index) => (
+            <Original 
+              key={banner._id}
+              backgroundImage={banner.image ? (banner.image.startsWith('/') ? process.env.PUBLIC_URL + banner.image : banner.image) : process.env.PUBLIC_URL + "/assets/original.png"}
+              title={banner.title}
+              description={banner.description}
+              buttonText={banner.buttonText}
+              onButtonClick={() => {
+                if (banner.buttonLink) {
+                  window.location.href = banner.buttonLink;
+                }
+              }}
+              textColor="gray.800"
+              descriptionColor="gray.700"
+            />
+          ))
+        ) : (
+          <Original 
+            backgroundImage={process.env.PUBLIC_URL + "/assets/original.png"}
+            textColor="gray.800"
+            descriptionColor="gray.700"
+          />
+        )}
 
         <DiscoverByCategory />
 
         {/* Best Sellers Section with Animation */}
         <div className="container-fluid pt-5">
-          <h3 className={`${styles.sectionTitle} position-relative mx-xl-5 mb-2`}>
-            <span className="p-3 ps-0" style={{
-              color: "#F7A9C7",
-              fontSize: windowWidth <= 480 ? '20px' : windowWidth <= 768 ? '24px' : '28px'
-            }}>
-              Best Sellers
-            </span>
-          </h3>
-          <h5 className={`${styles.sectionTitle} position-relative mx-xl-5 mb-4`}>
-            <span className="p-3 ps-0" style={{
-              color: "#000", 
-              fontSize: windowWidth <= 480 ? '14px' : '16px',
-              fontWeight: '300'
-            }}>
-              A gently formationA gently formationA gently formation
-            </span>
-          </h5>
+          <div style={{ marginBottom: '16px' }}>
+            <h3 className={`${styles.sectionTitle} position-relative mb-2`} style={{ margin: 0 }}>
+              <span style={{
+                color: "#F7A9C7",
+                fontSize: windowWidth <= 480 ? '20px' : windowWidth <= 768 ? '24px' : '28px'
+              }}>
+                {cmsContent?.bestSellersSection?.title || 'Best Sellers'}
+              </span>
+            </h3>
+            <h5 className={`${styles.sectionTitle} position-relative mb-4`} style={{ margin: 0 }}>
+              <span style={{
+                color: "#000", 
+                fontSize: windowWidth <= 480 ? '14px' : '16px',
+                fontWeight: '300'
+              }}>
+                {cmsContent?.bestSellersSection?.subtitle || 'A gently formationA gently formationA gently formation'}
+              </span>
+            </h5>
+          </div>
 
           {bestSellersStatus === 'loading' ? (
             <div className="row pb-3">
@@ -558,11 +648,28 @@ function Home() {
 
         <Brand />
 
-        <Original 
-          backgroundImage={process.env.PUBLIC_URL + "/assets/OriginalWHT.png"}
-          textColor="#fff"
-          descriptionColor="#fff"
-        />
+        {originalBanners && originalBanners.length > 1 ? (
+          <Original 
+            key={originalBanners[1]._id}
+            backgroundImage={originalBanners[1].image ? (originalBanners[1].image.startsWith('/') ? process.env.PUBLIC_URL + originalBanners[1].image : originalBanners[1].image) : process.env.PUBLIC_URL + "/assets/OriginalWHT.png"}
+            title={originalBanners[1].title}
+            description={originalBanners[1].description}
+            buttonText={originalBanners[1].buttonText}
+            onButtonClick={() => {
+              if (originalBanners[1].buttonLink) {
+                window.location.href = originalBanners[1].buttonLink;
+              }
+            }}
+            textColor="#fff"
+            descriptionColor="#fff"
+          />
+        ) : (
+          <Original 
+            backgroundImage={process.env.PUBLIC_URL + "/assets/OriginalWHT.png"}
+            textColor="#fff"
+            descriptionColor="#fff"
+          />
+        )}
 
         <VideoCarousel />
 

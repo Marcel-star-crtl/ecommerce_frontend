@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   fetchWishlist,
   removeFromWishlist,
   clearWishlist,
   resetWishlistStatus,
 } from "./wishlistSlice";
+import { addToCart } from "../cart/cartSlice";
 import { userAPI } from '../../api/api';
 import Loader from '../../components/Loader/Loader';
 
 export default function Wishlist() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // Get data from Redux store
   const {
@@ -89,24 +92,49 @@ export default function Wishlist() {
   const deleteItem = async (productId) => {
     setRemovingProductId(productId);
     try {
+      console.log("Removing from wishlist, productId:", productId);
       // Use the API directly for better control
       await userAPI.removeFromWishlist(productId);
       // Refresh the wishlist after removal
       dispatch(fetchWishlist({ page, size: pageSize }));
     } catch (error) {
       console.error("Failed to remove from wishlist:", error);
+      // Still refresh to sync with backend state
+      dispatch(fetchWishlist({ page, size: pageSize }));
     } finally {
       setRemovingProductId(null);
     }
   };
 
-  const addToCart = async (product) => {
+  const [addingToCartId, setAddingToCartId] = useState(null);
+
+  const addToCartHandler = async (product) => {
+    setAddingToCartId(product._id);
     try {
-      // Add to cart logic here - you can import and use cart actions
       console.log("Adding to cart:", product);
-      // Example: dispatch(addToCart({ productId: product._id, quantity: 1 }));
+      await dispatch(addToCart({ 
+        product: product, 
+        quantity: 1 
+      })).unwrap();
+      console.log("Successfully added to cart!");
+      
+      // Remove from wishlist after adding to cart
+      await deleteItem(product._id);
     } catch (error) {
       console.error('Error adding to cart:', error);
+    } finally {
+      setAddingToCartId(null);
+    }
+  };
+
+  const viewSimilarProducts = (product) => {
+    // Navigate to a category page or products page filtered by category
+    if (product.category) {
+      const categoryId = product.category._id || product.category;
+      navigate(`/products?category=${categoryId}`);
+    } else {
+      // Fallback: navigate to all products
+      navigate('/products');
     }
   };
 
@@ -466,6 +494,7 @@ export default function Wishlist() {
                     Brand: {product?.brand || 'Unknown Brand'}
                   </p>
                   <button
+                    onClick={() => viewSimilarProducts(product)}
                     style={{
                       background: "none",
                       border: "none",
@@ -475,7 +504,10 @@ export default function Wishlist() {
                       textDecoration: "underline",
                       padding: "0",
                       fontWeight: "500",
+                      transition: "color 0.2s",
                     }}
+                    onMouseOver={(e) => e.target.style.color = "#1a73e8"}
+                    onMouseOut={(e) => e.target.style.color = "#4285f4"}
                   >
                     View similar products
                   </button>
@@ -510,28 +542,34 @@ export default function Wishlist() {
                   >
                     {/* Add to Cart Button */}
                     <button
-                      onClick={() => addToCart(product)}
+                      onClick={() => addToCartHandler(product)}
+                      disabled={addingToCartId === product._id}
                       style={{
                         padding: "10px 20px",
-                        backgroundColor: "#E8A5C4",
+                        backgroundColor: addingToCartId === product._id ? "#ccc" : "#E8A5C4",
                         color: "white",
                         border: "none",
                         borderRadius: "4px",
                         fontSize: "12px",
                         fontWeight: "500",
-                        cursor: "pointer",
+                        cursor: addingToCartId === product._id ? "not-allowed" : "pointer",
                         transition: "background-color 0.2s",
                         textTransform: "uppercase",
                         letterSpacing: "0.5px",
+                        opacity: addingToCartId === product._id ? 0.7 : 1,
                       }}
-                      onMouseOver={(e) =>
-                        (e.target.style.backgroundColor = "#E298BC")
-                      }
-                      onMouseOut={(e) =>
-                        (e.target.style.backgroundColor = "#E8A5C4")
-                      }
+                      onMouseOver={(e) => {
+                        if (addingToCartId !== product._id) {
+                          e.target.style.backgroundColor = "#E298BC";
+                        }
+                      }}
+                      onMouseOut={(e) => {
+                        if (addingToCartId !== product._id) {
+                          e.target.style.backgroundColor = "#E8A5C4";
+                        }
+                      }}
                     >
-                      ADD TO CART
+                      {addingToCartId === product._id ? "ADDING..." : "ADD TO CART"}
                     </button>
 
                     {/* Heart Icon (Remove from Wishlist) */}
