@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createOrder } from '../order/ordersSlice';
 import { useSelector, useDispatch } from 'react-redux';
-import api, { mobileMoneyAPI } from '../../api/api'; 
+import api, { mobileMoneyAPI } from '../../api/api';
+import './checkout.css'; 
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -251,47 +252,16 @@ const CheckoutPage = () => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#f8f9fa',
-      padding: '20px',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-    }}>
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        overflow: 'hidden',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-      }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 400px',
-          minHeight: '100vh'
-        }}>
-          <div style={{
-            padding: '40px',
-            borderRight: '1px solid #e5e5e5'
-          }}>
+    <div className="checkout-page">
+      <div className="checkout-wrapper">
+        <div className="checkout-grid">
+          <div className="checkout-form-container">
             <form onSubmit={handleSubmit}>
-              <section style={{ marginBottom: '40px' }}>
-                <h2 style={{
-                  fontSize: '18px',
-                  fontWeight: '600',
-                  color: '#333',
-                  marginBottom: '20px',
-                  borderBottom: '1px solid #e5e5e5',
-                  paddingBottom: '10px'
-                }}>
+              <section className="form-section">
+                <h2 className="section-title">
                   Contact Information
                 </h2>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '15px',
-                  marginBottom: '15px'
-                }}>
+                <div className="form-row">
                   <div>
                     <input 
                       type="text" 
@@ -300,15 +270,7 @@ const CheckoutPage = () => {
                       onChange={handleChange} 
                       placeholder="First name"
                       required
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        outline: 'none',
-                        transition: 'border-color 0.2s'
-                      }}
+                      className="form-input"
                     />
                   </div>
                   <div>
@@ -319,23 +281,11 @@ const CheckoutPage = () => {
                       onChange={handleChange} 
                       placeholder="Last name"
                       required
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        outline: 'none',
-                        transition: 'border-color 0.2s'
-                      }}
+                      className="form-input"
                     />
                   </div>
                 </div>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '15px'
-                }}>
+                <div className="form-row">
                   <div>
                     <input 
                       type="email" 
@@ -344,15 +294,7 @@ const CheckoutPage = () => {
                       onChange={handleChange} 
                       placeholder="Email"
                       required
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        outline: 'none',
-                        transition: 'border-color 0.2s'
-                      }}
+                      className="form-input"
                     />
                   </div>
                   <div>
@@ -363,37 +305,17 @@ const CheckoutPage = () => {
                       onChange={handleChange} 
                       placeholder="Phone Number"
                       required
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        outline: 'none',
-                        transition: 'border-color 0.2s'
-                      }}
+                      className="form-input"
                     />
                   </div>
                 </div>
               </section>
 
-              <section style={{ marginBottom: '40px' }}>
-                <h2 style={{
-                  fontSize: '18px',
-                  fontWeight: '600',
-                  color: '#333',
-                  marginBottom: '20px',
-                  borderBottom: '1px solid #e5e5e5',
-                  paddingBottom: '10px'
-                }}>
+              <section className="form-section">
+                <h2 className="section-title">
                   Shipping Information
                 </h2>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '15px',
-                  marginBottom: '15px'
-                }}>
+                <div className="form-row">
                   <div>
                     <input 
                       type="text" 
@@ -402,15 +324,7 @@ const CheckoutPage = () => {
                       onChange={handleChange} 
                       placeholder="Country"
                       required
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        outline: 'none',
-                        transition: 'border-color 0.2s'
-                      }}
+                      className="form-input"
                     />
                   </div>
                   <div>
@@ -421,23 +335,11 @@ const CheckoutPage = () => {
                       onChange={handleChange} 
                       placeholder="City"
                       required
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        outline: 'none',
-                        transition: 'border-color 0.2s'
-                      }}
+                      className="form-input"
                     />
                   </div>
                 </div>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '15px'
-                }}>
+                <div className="form-row">
                   <div>
                     <input 
                       type="text" 
@@ -446,15 +348,7 @@ const CheckoutPage = () => {
                       onChange={handleChange} 
                       placeholder="Address"
                       required
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        outline: 'none',
-                        transition: 'border-color 0.2s'
-                      }}
+                      className="form-input"
                     />
                   </div>
                   <div>
@@ -465,193 +359,65 @@ const CheckoutPage = () => {
                       onChange={handleChange} 
                       placeholder="Postal Code"
                       required
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        outline: 'none',
-                        transition: 'border-color 0.2s'
-                      }}
+                      className="form-input"
                     />
                   </div>
                 </div>
               </section>
-
-              {/* Terms and Conditions */}
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  fontSize: '14px',
-                  color: '#666',
-                  cursor: 'pointer'
-                }}>
-                  <input 
-                    type="checkbox" 
-                    name="acceptTerms" 
-                    checked={formData.acceptTerms} 
-                    onChange={handleChange}
-                    required
-                    style={{ marginRight: '8px', marginTop: '2px' }}
-                  />
-                  <span>
-                    By proceeding I accept the{' '}
-                    <a href="#" style={{ color: '#e91e63', textDecoration: 'none' }}>
-                      Terms & Conditions
-                    </a>
-                  </span>
-                </label>
-              </div>
             </form>
           </div>
 
           {/* Right Column - Order Summary */}
-          <div style={{
-            backgroundColor: '#f8f9fa',
-            padding: '40px 30px'
-          }}>
-            <h2 style={{
-              fontSize: '18px',
-              fontWeight: '600',
-              color: '#333',
-              marginBottom: '30px'
-            }}>
+          <div className="order-summary-container">
+            <h2 className="summary-title">
               Order Summary
             </h2>
             
             {/* Product Items */}
-            <div style={{ marginBottom: '30px' }}>
+            <div className="products-list">
               {cartProducts.map((item, index) => (
-                <div key={item.id || index} style={{
-                  display: 'flex',
-                  gap: '15px',
-                  marginBottom: '20px',
-                  paddingBottom: '20px',
-                  borderBottom: index < cartProducts.length - 1 ? '1px solid #e5e5e5' : 'none'
-                }}>
-                  <div style={{
-                    width: '80px',
-                    height: '80px',
-                    backgroundColor: 'white',
-                    // borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    overflow: 'hidden', 
-                    padding: '0px' 
-                  }}>
+                <div key={item.id || index} className="product-item">
+                  <div className="product-image">
                     <img 
                       src={getCheckoutItemImageUrl(item)}
                       alt={item.name || item.title || 'Product'}
-                      style={{
-                        width: '80px',
-                        height: '80px',
-                        objectFit: 'cover', 
-                        display: 'block'
-                      }}
                     />
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <h3 style={{
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      color: '#333',
-                      margin: '0 0 5px 0'
-                    }}>
+                  <div className="product-details">
+                    <h3 className="product-name">
                       {item.name || item.title || 'Shyneen Glow'}
                     </h3>
-                    <p style={{
-                      fontSize: '12px',
-                      color: '#666',
-                      margin: '0 0 5px 0',
-                      lineHeight: '1.3'
-                    }}>
+                    <p className="product-description">
                       {item.description || 'Celestial Nightly Skin Repair for firming, Hydrating and Restoring'}
                     </p>
-                    <p style={{
-                      fontSize: '12px',
-                      color: '#666',
-                      margin: '0 0 10px 0'
-                    }}>
+                    <p className="product-size">
                       Size: {item.size || '1 oz/30 mL'}
                     </p>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between'
-                    }}>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}>
+                    <div className="product-actions">
+                      <div className="quantity-controls">
                         <button
                           onClick={() => updateQuantity(item.id, (item.quantity || 1) - 1)}
-                          style={{
-                            width: '20px',
-                            height: '20px',
-                            border: '1px solid #ddd',
-                            backgroundColor: 'white',
-                            fontSize: '12px',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderRadius: '2px'
-                          }}
+                          className="quantity-btn"
+                          type="button"
                         >
                           −
                         </button>
-                        <span style={{
-                          fontSize: '12px',
-                          minWidth: '15px',
-                          textAlign: 'center',
-                          fontWeight: '500'
-                        }}>
+                        <span className="quantity-value">
                           {item.quantity || 1}
                         </span>
                         <button
                           onClick={() => updateQuantity(item.id, (item.quantity || 1) + 1)}
-                          style={{
-                            width: '20px',
-                            height: '20px',
-                            border: '1px solid #ddd',
-                            backgroundColor: 'white',
-                            fontSize: '12px',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderRadius: '2px'
-                          }}
+                          className="quantity-btn"
+                          type="button"
                         >
                           +
                         </button>
                       </div>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}>
-                        <button style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#e91e63',
-                          fontSize: '12px',
-                          cursor: 'pointer',
-                          padding: '2px 8px',
-                          borderRadius: '2px'
-                        }}>
+                      <div className="product-price-actions">
+                        <button className="remove-btn" type="button">
                           REMOVE
                         </button>
-                        <span style={{
-                          fontSize: '14px',
-                          fontWeight: '600',
-                          color: '#333'
-                        }}>
+                        <span className="product-price">
                           ${(item.price || 65).toFixed(2)}
                         </span>
                       </div>
@@ -662,94 +428,53 @@ const CheckoutPage = () => {
             </div>
 
             {/* Order Totals */}
-            <div style={{
-              borderTop: '1px solid #e5e5e5',
-              paddingTop: '20px',
-              marginBottom: '30px'
-            }}>
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginBottom: '12px'
-              }}>
-                <span style={{ fontSize: '14px', color: '#666' }}>Subtotal</span>
-                <span style={{ fontSize: '14px', color: '#333' }}>${subtotal.toFixed(2)}</span>
+            <div className="order-totals">
+              <div className="total-row">
+                <span className="total-label">Subtotal</span>
+                <span className="total-value">${subtotal.toFixed(2)}</span>
               </div>
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginBottom: '12px'
-              }}>
-                <span style={{ fontSize: '14px', color: '#666' }}>Delivery Cost</span>
-                <span style={{ fontSize: '14px', color: '#333' }}>${deliveryCost.toFixed(2)}</span>
+              <div className="total-row">
+                <span className="total-label">Delivery Cost</span>
+                <span className="total-value">${deliveryCost.toFixed(2)}</span>
               </div>
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginBottom: '20px'
-              }}>
-                <span style={{ fontSize: '14px', color: '#666' }}>Discount</span>
-                <span style={{ fontSize: '14px', color: '#333' }}>${discount.toFixed(2)}</span>
+              <div className="total-row">
+                <span className="total-label">Discount</span>
+                <span className="total-value">${discount.toFixed(2)}</span>
               </div>
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                paddingTop: '15px',
-                borderTop: '1px solid #e5e5e5'
-              }}>
-                <span style={{ fontSize: '16px', fontWeight: '600', color: '#333' }}>Total Pay</span>
-                <span style={{ fontSize: '16px', fontWeight: '600', color: '#333' }}>${totalPay.toFixed(2)}</span>
-              </div>
+            </div>
+
+            <div className="grand-total">
+              <span className="grand-total-label">Total Pay</span>
+              <span className="grand-total-value">${totalPay.toFixed(2)}</span>
             </div>
 
             {/* Pay Now Button */}
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              style={{
-                width: '100%',
-                padding: '15px',
-                backgroundColor: isSubmitting ? '#ccc' : '#E8A5C4',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                fontSize: '16px',
-                fontWeight: '500',
-                cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                transition: 'background-color 0.2s',
-                opacity: isSubmitting ? 0.7 : 1
-              }}
-              onMouseOver={(e) => !isSubmitting && (e.target.style.backgroundColor = '#E8A5C4')}
-              onMouseOut={(e) => !isSubmitting && (e.target.style.backgroundColor = '#E8A5C4')}
+              className="pay-now-btn"
+              type="button"
             >
               {isSubmitting ? 'Processing...' : 'Pay Now'}
             </button>
             
             {/* Terms and Conditions */}
-            <div style={{ marginBottom: '20px' }}>
-                <label style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  fontSize: '14px',
-                  color: '#666',
-                  cursor: 'pointer',
-                  marginTop: '15px'
-                }}>
-                  <input 
-                    type="checkbox" 
-                    name="acceptTerms" 
-                    checked={formData.acceptTerms} 
-                    onChange={handleChange}
-                    required
-                    style={{ marginRight: '8px', marginTop: '2px' }}
-                  />
-                  <span>
-                    By proceeding I accept the{' '}
-                    <a href="#" style={{ color: '#E8A5C4', textDecoration: 'none' }}>
-                      Terms & Conditions
-                    </a>
-                  </span>
-                </label>
+            <div className="terms-container">
+              <label className="terms-label">
+                <input 
+                  type="checkbox" 
+                  name="acceptTerms" 
+                  checked={formData.acceptTerms} 
+                  onChange={handleChange}
+                  required
+                />
+                <span>
+                  By proceeding I accept the{' '}
+                  <a href="#" className="terms-link">
+                    Terms & Conditions
+                  </a>
+                </span>
+              </label>
             </div>
 
           </div>
